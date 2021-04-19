@@ -8,7 +8,8 @@
 import MapKit
 import UIKit
 
-typealias SaveLoacationDelegate = ((String, String, String)) -> Void
+typealias SaveLocationAlias = ((String, String, String)) -> Void
+protocol SaveLocationDelegate: class { func requestSave(locationElements: (String, String, String)) }
 
 class AddLocationVC: UIViewController {
     
@@ -16,7 +17,10 @@ class AddLocationVC: UIViewController {
     private var searchCompleter = MKLocalSearchCompleter()
     private var searchResults = [MKLocalSearchCompletion]()
     
-    var saveDelegate: SaveLoacationDelegate?
+    weak var saveDelegate: SaveLocationDelegate?
+    var saveLocationAlias: SaveLocationAlias?
+    
+    var guideLabel: UILabel!
     
     lazy var searchBar: UISearchBar = {
         let aa = UISearchBar(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 50))
@@ -24,7 +28,7 @@ class AddLocationVC: UIViewController {
         view.addSubview(aa)
         aa.translatesAutoresizingMaskIntoConstraints = false
         aa.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        aa.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        aa.topAnchor.constraint(equalTo: guideLabel.bottomAnchor).isActive = true
         aa.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
         aa.delegate = self
@@ -36,6 +40,7 @@ class AddLocationVC: UIViewController {
     lazy var searchResultTable: UITableView = {
         
         let tbv = UITableView()
+        tbv.separatorStyle = .none
         
         view.addSubview(tbv)
         tbv.translatesAutoresizingMaskIntoConstraints = false
@@ -56,6 +61,20 @@ class AddLocationVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let label = UILabel(frame: .zero)
+        guideLabel = label
+        
+        label.text = "Enter city, zip code, airport lcoation"
+        label.textAlignment = .center
+        label.textColor = .lightGray
+        
+        view.addSubview(label)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        label.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        label.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        label.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        
         view.backgroundColor = .systemBackground
         
         searchBar.delegate = self
@@ -65,7 +84,6 @@ class AddLocationVC: UIViewController {
         
         searchResultTable.delegate = self
         searchResultTable.dataSource = self
-        
     }
 }
 
@@ -135,10 +153,9 @@ extension AddLocationVC: UITableViewDelegate {
                 return
             }
             
-            ///TODO: CoreData 저장
-            self.saveDelegate?((placeMark.title ?? "", placeMark.coordinate.longitude.description, placeMark.coordinate.latitude.description))
-            
-            
+            // CoreData 저장 델리게이트 SaveLocationDelegate
+            self.saveDelegate?.requestSave(locationElements: (placeMark.title ?? "", placeMark.coordinate.longitude.description, placeMark.coordinate.latitude.description))
+                
             print("placeMark : \(placeMark)")
 //            let coordinate = Coordinate(coordinate: placeMark.coordinate)
 //            self.delegate?.userAdd(newLocation: Location(coordinate: coordinate, name: "\(placeMark.locality ?? selectedResult.title)"))

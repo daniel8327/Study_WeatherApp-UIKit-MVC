@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		643B9D19262D96F4006A0E88 /* LocationFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = 643B9D18262D96F4006A0E88 /* LocationFooter.xib */; };
+		643B9D1E262D9A2B006A0E88 /* LocationFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643B9D1D262D9A2B006A0E88 /* LocationFooter.swift */; };
 		64D4E413262AD827003DC20A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D4E412262AD827003DC20A /* AppDelegate.swift */; };
 		64D4E415262AD827003DC20A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D4E414262AD827003DC20A /* SceneDelegate.swift */; };
 		64D4E417262AD827003DC20A /* MainVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D4E416262AD827003DC20A /* MainVC.swift */; };
@@ -47,6 +49,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		643B9D18262D96F4006A0E88 /* LocationFooter.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LocationFooter.xib; sourceTree = "<group>"; };
+		643B9D1D262D9A2B006A0E88 /* LocationFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationFooter.swift; sourceTree = "<group>"; };
 		64D4E40F262AD827003DC20A /* Weather.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Weather.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		64D4E412262AD827003DC20A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		64D4E414262AD827003DC20A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -130,6 +134,8 @@
 				64D4E414262AD827003DC20A /* SceneDelegate.swift */,
 				64D4E416262AD827003DC20A /* MainVC.swift */,
 				64D4E4B5262B340B003DC20A /* AddLocationVC.swift */,
+				643B9D18262D96F4006A0E88 /* LocationFooter.xib */,
+				643B9D1D262D9A2B006A0E88 /* LocationFooter.swift */,
 				64D4E4BA262B36C3003DC20A /* Test.storyboard */,
 				64D4E41B262AD82A003DC20A /* Assets.xcassets */,
 				64D4E41D262AD82A003DC20A /* LaunchScreen.storyboard */,
@@ -301,6 +307,7 @@
 				64D4E4BB262B36C3003DC20A /* Test.storyboard in Resources */,
 				64D4E41F262AD82A003DC20A /* LaunchScreen.storyboard in Resources */,
 				64D4E41C262AD82A003DC20A /* Assets.xcassets in Resources */,
+				643B9D19262D96F4006A0E88 /* LocationFooter.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -358,6 +365,7 @@
 				64D4E463262B0B25003DC20A /* API.swift in Sources */,
 				64D4E415262AD827003DC20A /* SceneDelegate.swift in Sources */,
 				64D4E498262B1E3C003DC20A /* Model.xcdatamodeld in Sources */,
+				643B9D1E262D9A2B006A0E88 /* LocationFooter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
