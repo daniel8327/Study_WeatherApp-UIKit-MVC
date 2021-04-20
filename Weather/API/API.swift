@@ -57,9 +57,7 @@ class API {
 
                     print("path : \(convertible)\njson => \(json)\n")
 
-                    if let result = json["RESULT"].string,
-                       result == APIResult.SUCCESS.rawValue || result == APIResult.FAIL.rawValue
-                    {
+                    if json["cod"].intValue == 200 {
                         completionHandler(json)
                     } else {
                         // alert

@@ -29,6 +29,9 @@ let _WINDOW = _SD.window!
 
 let _ND = NotificationCenter.default
 
+
+var fahrenheitOrCelsius: FahrenheitOrCelsius = .Celsius
+
 // MARK: Screen 정보
 
 let Screen_Size = UIScreen.main.bounds

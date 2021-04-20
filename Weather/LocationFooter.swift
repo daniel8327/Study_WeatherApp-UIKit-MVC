@@ -28,7 +28,21 @@ class LocationFooter: UIView {
         theWeather.isUserInteractionEnabled = true
         
         notation.tag = 1
-        NotificationCenter.default.post(name: Notification.Name("CHANGE_NOTATION"), object: nil)
+        //NotificationCenter.default.post(name: Notification.Name("CHANGE_NOTATION"), object: nil)
+        
+        
+        // footer 바꾸기
+        let attributeString = NSMutableAttributedString(string: notation.text ?? "")
+        
+        let str = notation.text!
+        
+        let r1 = str.range(of: fahrenheitOrCelsius.emoji)!
+        // String range to NSRange:
+        let n1 = NSRange(r1, in: str)
+        
+        attributeString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.red, range: n1)
+
+        notation.attributedText = attributeString
     }
     
     @objc func goToWeb() {

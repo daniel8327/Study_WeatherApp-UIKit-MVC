@@ -8,8 +8,8 @@
 import MapKit
 import UIKit
 
-typealias SaveLocationAlias = ((String, String, String)) -> Void
-protocol SaveLocationDelegate: class { func requestSave(locationElements: (String, String, String)) }
+typealias SaveLocationAlias = ([String]) -> Void
+protocol SaveLocationDelegate: class { func requestSave(locationElements: [String]) }
 
 class AddLocationVC: UIViewController {
     
@@ -154,7 +154,7 @@ extension AddLocationVC: UITableViewDelegate {
             }
             
             // CoreData 저장 델리게이트 SaveLocationDelegate
-            self.saveDelegate?.requestSave(locationElements: (placeMark.title ?? "", placeMark.coordinate.longitude.description, placeMark.coordinate.latitude.description))
+            self.saveDelegate?.requestSave(locationElements: [placeMark.title ?? "", "", placeMark.coordinate.longitude.description, placeMark.coordinate.latitude.description])
                 
             print("placeMark : \(placeMark)")
 //            let coordinate = Coordinate(coordinate: placeMark.coordinate)

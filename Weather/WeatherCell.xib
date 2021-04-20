@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="WeatherCell" rowHeight="100" id="DAn-kz-iaX" customClass="WeatherCell" customModule="Weather" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="439" height="105"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="DAn-kz-iaX" id="xZa-hh-kWu">
+                <rect key="frame" x="0.0" y="0.0" width="439" height="105"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="252" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" text="22:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LWo-jA-j1g">
+                        <rect key="frame" x="16" y="28.5" width="47.5" height="21.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="대한민국" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ole-V1-BIe">
+                        <rect key="frame" x="16" y="50" width="76.5" height="26.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="20℃" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jsM-2r-Ze8">
+                        <rect key="frame" x="331.5" y="28.5" width="91.5" height="48"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="40"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                        <size key="shadowOffset" width="0.0" height="0.0"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="LWo-jA-j1g" firstAttribute="leading" secondItem="xZa-hh-kWu" secondAttribute="leading" constant="16" id="9pQ-Tv-arw"/>
+                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="Ole-V1-BIe" secondAttribute="bottom" constant="16" id="Ems-Gu-h5q"/>
+                    <constraint firstItem="LWo-jA-j1g" firstAttribute="top" relation="greaterThanOrEqual" secondItem="xZa-hh-kWu" secondAttribute="top" constant="16" id="FB9-RR-pTA"/>
+                    <constraint firstAttribute="trailing" secondItem="jsM-2r-Ze8" secondAttribute="trailing" constant="16" id="JIo-ZF-xcf"/>
+                    <constraint firstItem="Ole-V1-BIe" firstAttribute="leading" secondItem="LWo-jA-j1g" secondAttribute="leading" id="L7n-RG-sh6"/>
+                    <constraint firstItem="LWo-jA-j1g" firstAttribute="top" secondItem="jsM-2r-Ze8" secondAttribute="top" id="Oab-3b-4LU"/>
+                    <constraint firstItem="jsM-2r-Ze8" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Ole-V1-BIe" secondAttribute="trailing" constant="8" id="aBJ-KE-1HG"/>
+                    <constraint firstItem="jsM-2r-Ze8" firstAttribute="centerY" secondItem="xZa-hh-kWu" secondAttribute="centerY" id="fRR-pF-2Ef"/>
+                    <constraint firstItem="Ole-V1-BIe" firstAttribute="bottom" secondItem="jsM-2r-Ze8" secondAttribute="bottom" id="ixr-2N-0XH"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="locationName" destination="Ole-V1-BIe" id="DkQ-ED-mir"/>
+                <outlet property="temperture" destination="jsM-2r-Ze8" id="72A-Lj-LcV"/>
+                <outlet property="time" destination="LWo-jA-j1g" id="e1y-9a-Rn4"/>
+            </connections>
+            <point key="canvasLocation" x="205.07246376811597" y="39.84375"/>
+        </tableViewCell>
+    </objects>
+</document>
