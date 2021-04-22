@@ -60,7 +60,7 @@ class MainVC: UIViewController {
         }
     }
     
-    var currentLocation: CLPlacemark?
+    var currentLocation: CLLocation?
     
     lazy var tableView: UITableView = {
         
@@ -136,7 +136,7 @@ class MainVC: UIViewController {
         if CLLocationManager.locationServicesEnabled() {
             print("위치 서비스 On 상태")
             locationManager.startUpdatingLocation() //위치 정보 받아오기 시작 CLLocationManagerDelegate
-            print(locationManager.location?.coordinate)
+            //print(locationManager.location?.coordinate)
         } else {
             print("위치 서비스 Off 상태")
         }
@@ -147,7 +147,6 @@ class MainVC: UIViewController {
         
         // 설정된 도시 없으면 물어보기
         if self.locations.isEmpty {
-            print("no data")
             let alert = UIAlertController(title: "지역 선택", message: "날씨 정보를 받아볼 지역을 검색하세요.", preferredStyle: .alert)
             let confirmAction = UIAlertAction(title: "확인", style: .default) { _ in
                 self.addLocation()
@@ -293,63 +292,52 @@ class MainVC: UIViewController {
             return false
         }
     }
-    
-    func convertToAddressWith(coordinate: CLLocation) {
-        let geoCoder = CLGeocoder()
-        geoCoder.reverseGeocodeLocation(coordinate) { (placemarks, error) -> Void in
-            if error != nil {
-                NSLog("\(error)")
-                return
-            }
-            
-            guard let placemark = placemarks?.first,
-                  let addrList = placemark.addressDictionary?["FormattedAddressLines"] as? [String]
-            else { return }
-                  
-            let address = addrList.joined(separator: " ")
-            
-            print(address)
-            print("placemark: \(placemark)")
-            
-            self.currentLocation = placemark
-            
-            let headerView = UINib(nibName: "WeatherCell", bundle: nil).instantiate(withOwner: self, options: [:]).first as! WeatherCell
-            self.tableView.tableHeaderView = headerView
-            
-            self.setHeaderView()
-            
-        }
-    }
+//
+//    func convertToAddressWith(coordinate: CLLocation) {
+//        let geoCoder = CLGeocoder()
+//        geoCoder.reverseGeocodeLocation(coordinate) { (placemarks, error) -> Void in
+//            if error != nil {
+//                NSLog("\(error)")
+//                return
+//            }
+//
+//            guard let placemark = placemarks?.first else { return }
+//
+//            print("placemark: \(placemark)")
+//
+//            self.currentLocation = placemark
+//
+//            let headerView = UINib(nibName: "WeatherCell", bundle: nil).instantiate(withOwner: self, options: [:]).first as! WeatherCell
+//            self.tableView.tableHeaderView = headerView
+//
+//            self.setHeaderView()
+//
+//        }
+//    }
     
     func setHeaderView() {
         
         guard let headerView: WeatherCell = tableView.tableHeaderView as? WeatherCell,
-              let placemark = self.currentLocation
+              let location = self.currentLocation
         else { return }
             
-        headerView.locationName.text = placemark.name
+        headerView.locationName.text = "--"
         headerView.temperture.text = "--\(fahrenheitOrCelsius.emoji)"
         
-        let param: [String: Any] = ["lat": placemark.location?.coordinate.latitude, "lon": placemark.location?.coordinate.longitude, "appid": "0367480f207592a2a18d028adaac65d2", "units": fahrenheitOrCelsius.pameter] //imperial - Fahrenheit
-        API.init(session: Session.default)
+        let param: [String: Any] = ["lat": location.coordinate.latitude,
+                                    "lon": location.coordinate.longitude,
+                                    "appid": "0367480f207592a2a18d028adaac65d2",
+                                    "lang": _COUNTRY,
+                                    "units": fahrenheitOrCelsius.pameter] //imperial - Fahrenheit
+        API(session: Session.default)
             .request("https://api.openweathermap.org/data/2.5/weather", method: .get, parameters: param, encoding: URLEncoding.default, headers: nil, interceptor: nil, requestModifier: nil) { json in
                 
-                print(JSON(json))
+                //print(JSON(json))
                 
+                headerView.locationName.text = "현재위치 - \(json["name"].stringValue)"
                 headerView.temperture.text = "\(json["main"]["temp"].intValue)\(fahrenheitOrCelsius.emoji)"
-                var date = Date()
-                print(date)
-                
-                date.addTimeInterval(32400)
-                print(date)
-                
                 headerView.time.text = Date().getCountryTime(byTimeZone: json["timezone"].intValue)
-                
             }
-        
-//            let headerView = UITableViewCell(style: .subtitle, reuseIdentifier: "Header")
-//            headerView.textLabel?.text = self.currentLocation
-//            headerView.detailTextLabel?.text = placemark.country ?? "UnKnown"
     }
 }
 extension Date {
@@ -386,9 +374,12 @@ extension MainVC: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "WeatherCell") as! WeatherCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "WeatherCell") as? WeatherCell
+        else { fatalError() }
         
-        cell.contentView.setCardView()
+        cell.backgroundColor = .random
+        //cell.contentView.setCardView()
+        UICommon.roundCorners(view: cell.contentView, corners: [.allCorners], size: 10)
         cell.separatorInset = UIEdgeInsets.zero // https://zeddios.tistory.com/235
                 
         let record = locations[indexPath.row]
@@ -405,52 +396,66 @@ extension MainVC: UITableViewDataSource {
             return cell
         }
         
-        let param: [String: Any] = ["lat": latitude, "lon": logitude, "appid": "0367480f207592a2a18d028adaac65d2", "units": fahrenheitOrCelsius.pameter]
+        let param: [String: Any] = ["lat": latitude,
+                                    "lon": logitude,
+                                    "appid": "0367480f207592a2a18d028adaac65d2",
+                                    "lang": _COUNTRY,
+                                    "units": fahrenheitOrCelsius.pameter]
         API.init(session: Session.default)
             .request("https://api.openweathermap.org/data/2.5/weather", method: .get, parameters: param, encoding: URLEncoding.default, headers: nil, interceptor: nil, requestModifier: nil) { json in
                 
-                print(JSON(json))
+                //print(JSON(json))
                 
                 let temp = json["main"]["temp"].intValue
                 cell.temperture.text = "\(temp)\(fahrenheitOrCelsius.emoji)"
                 
                 cell.time.text = Date().getCountryTime(byTimeZone: json["timezone"].intValue)
-                self.edit(object: record, city: nil, cityCode: nil, temperature: temp)
+                self.edit(object: record, city: nil, cityCode: json["id"].stringValue, temperature: temp)
+                
+                
+                
+//                print(Date())
+//                print(Date().addingTimeInterval(32400))
+//
+//
+//                print(Date(timeIntervalSince1970: TimeInterval(1618983823)).addingTimeInterval(32400)) // current
+//                print(Date(timeIntervalSince1970: TimeInterval(1618951711)).addingTimeInterval(32400)) // sunrise
+//                print(Date(timeIntervalSince1970: TimeInterval(1618999872)).addingTimeInterval(32400)) // sunset
+//                print(Date(timeIntervalSince1970: TimeInterval(1618983840)).addingTimeInterval(32400)) // minutely
+//                print(Date(timeIntervalSince1970: TimeInterval(1618981200)).addingTimeInterval(32400)) // hourly
+//                print(Date(timeIntervalSince1970: TimeInterval(1618984800)).addingTimeInterval(32400)) // hourly2
+//                print(Date(timeIntervalSince1970: TimeInterval(1618974000)).addingTimeInterval(32400)) // daily
+//                print(Date(timeIntervalSince1970: TimeInterval(1619060400)).addingTimeInterval(32400)) // daily2
+//                print(Date(timeIntervalSince1970: TimeInterval(1619578800)).addingTimeInterval(32400)) // daily-final
+//                print(Date(timeIntervalSince1970: TimeInterval(1619089200)).addingTimeInterval(32400)) // rome
+                
             }
         
         return cell
-    }}
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 100
+    }
+}
 
 extension MainVC: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("\(indexPath.row) selected")
         
         let object = locations[indexPath.row]
         let city = object.value(forKey: "city") as? String
         let code = object.value(forKey: "code") as? String
         
-        let alert = UIAlertController(title: "Modify", message: nil, preferredStyle: .alert)
         
-        alert.addTextField { $0.text = city }
-        alert.addTextField { $0.text = code }
+        var location = CLLocation(
+            latitude: CLLocationDegrees(Double(object.value(forKey: "latitude") as! String)!),
+            longitude: CLLocationDegrees(Double(object.value(forKey: "longitude") as! String)!)
+        )
         
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Save", style: .default, handler: { (_) in
-            guard let city = alert.textFields?.first?.text, let code = alert.textFields?.last?.text else {
-                return
-            }
-            
-            if self.edit(object: object, city: city, cityCode: code, temperature: nil) {
-                //self.tableView.reloadData()
-                
-                let cell = self.tableView.cellForRow(at: indexPath)
-                cell?.textLabel?.text = city
-                cell?.detailTextLabel?.text = code
-                
-                self.tableView.moveRow(at: indexPath, to: IndexPath(item: 0, section: 0))
-            }
-        }))
-        self.present(alert, animated: true)
+        let vc = DetailWeatherVC(locationName: city!, location: location)
+        
+        UICommon.setTransitionAnimation(navi: self.navigationController)
+        self.present(vc, animated: true)
         
     }
     
@@ -483,15 +488,30 @@ extension MainVC: UITableViewDelegate {
 }
 
 extension MainVC: CLLocationManagerDelegate {
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let loc = manager.location {
-            count += 1
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == .authorizedAlways || status == .authorizedWhenInUse {
+            guard let currentLocation = locationManager.location else { return }
             
-            convertToAddressWith(coordinate: loc)
-            print("\(count): \(loc.coordinate.longitude)")
-            print("\(count): \(loc.coordinate.latitude)")
+            self.currentLocation = currentLocation
+            
+            let headerView = UINib(nibName: "WeatherCell", bundle: nil).instantiate(withOwner: self, options: [:]).first as! WeatherCell
+            headerView.frame.size.height = 100
+            headerView.backgroundColor = .random
+            self.tableView.tableHeaderView = headerView
+            
+            self.setHeaderView()
         }
     }
+//    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+//        if let loc = manager.location {
+//            count += 1
+//
+//            convertToAddressWith(coordinate: loc)
+//            print("\(count): \(loc.coordinate.longitude)")
+//            print("\(count): \(loc.coordinate.latitude)")
+//        }
+//    }
 }
 
 extension MainVC: SaveLocationDelegate {

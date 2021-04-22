@@ -29,6 +29,7 @@ let _WINDOW = _SD.window!
 
 let _ND = NotificationCenter.default
 
+let _COUNTRY = UICommon.getCountryCode()
 
 var fahrenheitOrCelsius: FahrenheitOrCelsius = .Celsius
 

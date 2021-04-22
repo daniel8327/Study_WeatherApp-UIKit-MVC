@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -17,11 +17,11 @@
             <point key="canvasLocation" x="-928" y="-15"/>
         </view>
         <view contentMode="scaleToFill" id="g3j-lf-deU" customClass="LocationFooter" customModule="Weather" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="414" height="50"/>
+            <rect key="frame" x="0.0" y="0.0" width="414" height="62"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oxa-xC-Pey">
-                    <rect key="frame" x="20" y="8" width="51" height="26"/>
+                    <rect key="frame" x="20" y="21" width="51" height="20.5"/>
                     <attributedString key="attributedText">
                         <fragment content="℃ / ℉">
                             <attributes>
@@ -33,13 +33,14 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="theweather" translatesAutoresizingMaskIntoConstraints="NO" id="nIJ-h9-rPo">
-                    <rect key="frame" x="194" y="8" width="26" height="26"/>
+                    <rect key="frame" x="192" y="16" width="30" height="30"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="nIJ-h9-rPo" secondAttribute="height" multiplier="1:1" id="KLf-P0-cTV"/>
+                        <constraint firstAttribute="width" constant="30" id="NyP-xd-eQE"/>
                     </constraints>
                 </imageView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Fqg-Vs-gQn">
-                    <rect key="frame" x="374" y="8" width="20" height="26"/>
+                    <rect key="frame" x="374" y="20" width="20" height="22"/>
                     <state key="normal" image="magnifyingglass" catalog="system"/>
                     <connections>
                         <action selector="searchLocationTapped:" destination="g3j-lf-deU" eventType="touchUpInside" id="dYf-w1-l72"/>
@@ -49,13 +50,11 @@
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
                 <constraint firstItem="Fqg-Vs-gQn" firstAttribute="centerY" secondItem="nIJ-h9-rPo" secondAttribute="centerY" id="1Jo-yu-3ju"/>
-                <constraint firstItem="oxa-xC-Pey" firstAttribute="height" secondItem="nIJ-h9-rPo" secondAttribute="height" id="HSW-wU-7sc"/>
                 <constraint firstAttribute="trailing" secondItem="Fqg-Vs-gQn" secondAttribute="trailing" constant="20" id="HdU-S4-NfL"/>
                 <constraint firstItem="oxa-xC-Pey" firstAttribute="centerY" secondItem="nIJ-h9-rPo" secondAttribute="centerY" id="PyY-Hu-Eju"/>
                 <constraint firstAttribute="bottom" secondItem="nIJ-h9-rPo" secondAttribute="bottom" constant="16" id="QZl-ox-0Jf"/>
                 <constraint firstItem="nIJ-h9-rPo" firstAttribute="centerX" secondItem="g3j-lf-deU" secondAttribute="centerX" id="RwB-Uk-sn2"/>
-                <constraint firstItem="Fqg-Vs-gQn" firstAttribute="height" secondItem="nIJ-h9-rPo" secondAttribute="height" id="go4-3d-2w5"/>
-                <constraint firstItem="nIJ-h9-rPo" firstAttribute="top" secondItem="g3j-lf-deU" secondAttribute="top" constant="8" id="nML-OE-KnF"/>
+                <constraint firstItem="nIJ-h9-rPo" firstAttribute="top" secondItem="g3j-lf-deU" secondAttribute="top" constant="16" id="nML-OE-KnF"/>
                 <constraint firstItem="oxa-xC-Pey" firstAttribute="leading" secondItem="g3j-lf-deU" secondAttribute="leading" constant="20" id="vG8-hZ-s17"/>
             </constraints>
             <nil key="simulatedTopBarMetrics"/>

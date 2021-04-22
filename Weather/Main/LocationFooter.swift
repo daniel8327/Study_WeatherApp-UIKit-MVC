@@ -12,7 +12,7 @@ class LocationFooter: UIView {
     @IBOutlet weak var notation: UILabel!
     @IBOutlet weak var theWeather: UIImageView!
     
-    override class func awakeFromNib() {
+    override func awakeFromNib() {
         super.awakeFromNib()
     }
     

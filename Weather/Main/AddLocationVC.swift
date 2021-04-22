@@ -49,8 +49,7 @@ class AddLocationVC: UIViewController {
         tbv.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         tbv.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         
-        
-        //tbv.register(UINib(nibName: "", bundle: nil), forCellReuseIdentifier: "")
+        tbv.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         
         return tbv
     }()
@@ -123,13 +122,9 @@ extension AddLocationVC: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: UITableViewCell!
         
-        if let cell2 = tableView.dequeueReusableCell(withIdentifier: "Cell") {
-            cell = cell2
-        } else {
-            cell = UITableViewCell(style: .default, reuseIdentifier: "Cell")
-        }
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
+        else { fatalError() }
         
         let searchResult = searchResults[indexPath.row]
         cell.textLabel?.text = searchResult.title
