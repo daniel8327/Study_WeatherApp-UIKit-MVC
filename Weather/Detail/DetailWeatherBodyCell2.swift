@@ -11,17 +11,48 @@ import SwiftyJSON
 
 class DetailWeatherBodyCell2: UITableViewCell {
     
-    private(set) var collectionView: UICollectionView
+    private lazy var collectionView: UICollectionView = {
+       
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        
+        collectionView.isUserInteractionEnabled = true
+        
+        //collectionView.register(DetailWeatherCollectionViewCell.self, forCellWithReuseIdentifier: DetailWeatherCollectionViewCell.reusableIdentifier) // code base
+        collectionView.register(UINib(nibName: DetailWeatherCollectionViewCell.reusableIdentifier, bundle: nil), forCellWithReuseIdentifier: DetailWeatherCollectionViewCell.reusableIdentifier) // ui base
+        
+        // Add `coolectionView` to display hierarchy and setup its appearance
+        self.addSubview(collectionView)
+        
+        collectionView.contentInsetAdjustmentBehavior = .always
+        
+        // Setup Autolayout constraints
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0).isActive = true
+        collectionView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 0).isActive = true
+        collectionView.topAnchor.constraint(equalTo: self.topAnchor, constant: 0).isActive = true
+        collectionView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: 0).isActive = true
+        
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.backgroundColor = .yellow
+        
+        return collectionView
+    }()
     
-    var layout: UICollectionViewFlowLayout = {
+    private lazy var layout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.estimatedItemSize = CGSize(width: 100, height: 100)
+        //layout.estimatedItemSize = CGSize(width: 100, height: 100)
+        
+        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        
+        layout.sectionInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16) // CollectionView 의 전체 마진
+        layout.minimumLineSpacing = 16 // 셀 아이템간의 라인 마진
+        layout.minimumInteritemSpacing = 16 // 셀 아이템간의 측면 마진
+        
         return layout
     }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         super.init(style: style, reuseIdentifier: reuseIdentifier)
     }
     
@@ -35,31 +66,9 @@ class DetailWeatherBodyCell2: UITableViewCell {
         super.awakeFromNib()
     }
     
-    func config(hourly: [JSON]) {
-        
+    func setHourly(hourly: [JSON]) {
         self.hourly = hourly
-        
-        //collectionView.register(DetailWeatherCollectionViewCell.self, forCellWithReuseIdentifier: "DetailWeatherCollectionViewCell") // code base
-        collectionView.register(UINib(nibName: "DetailWeatherCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "DetailWeatherCollectionViewCell") // ui base
-        
-        // Add `coolectionView` to display hierarchy and setup its appearance
-        self.addSubview(collectionView)
-        //collectionView.backgroundColor = .white
-        collectionView.contentInsetAdjustmentBehavior = .always
-        collectionView.contentInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-        
-        // Setup Autolayout constraints
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0).isActive = true
-        collectionView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 0).isActive = true
-        collectionView.topAnchor.constraint(equalTo: self.topAnchor, constant: 0).isActive = true
-        collectionView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: 0).isActive = true
-        
         collectionView.dataSource = self
-    
-        
-        (collectionView.collectionViewLayout as! UICollectionViewFlowLayout).estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-        (collectionView.collectionViewLayout as! UICollectionViewFlowLayout).sectionInsetReference = .fromLayoutMargins
     }
 }
 

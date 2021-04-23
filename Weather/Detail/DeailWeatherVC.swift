@@ -42,8 +42,8 @@ class DetailWeatherVC: UIViewController {
         //tbv.backgroundColor = .red
         
         tbv.register(UINib(nibName: "DetailWeatherHeaderCell", bundle: nil), forHeaderFooterViewReuseIdentifier: "DetailWeatherHeaderCell")
-        tbv.register(UINib(nibName: "DetailWeatherBodyCell", bundle: nil), forCellReuseIdentifier: "DetailWeatherBodyCell") // ui base
-//        tbv.register(DetailWeatherBodyCell2.self, forCellReuseIdentifier: "DetailWeatherBodyCell2") // code base
+//        tbv.register(UINib(nibName: DetailWeatherBodyCell.reusableIdentifier, bundle: nil), forCellReuseIdentifier: DetailWeatherBodyCell.reusableIdentifier) // ui base
+        tbv.register(DetailWeatherBodyCell2.self, forCellReuseIdentifier: DetailWeatherBodyCell2.reusableIdentifier) // code base
         //tbv.register(UINib(nibName: "DetailWeatherFooterCell", bundle: nil), forHeaderFooterViewReuseIdentifier: "DetailWeatherFooterCell")
         tbv.register(DetailWeatherFooterCell.self, forCellReuseIdentifier: DetailWeatherFooterCell.reusableIdentifier)
         
@@ -90,7 +90,8 @@ extension DetailWeatherVC: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "DetailWeatherBodyCell") as? DetailWeatherBodyCell,
+//        guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailWeatherBodyCell.reusableIdentifier) as? DetailWeatherBodyCell,
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailWeatherBodyCell2.reusableIdentifier) as? DetailWeatherBodyCell2,
               let hourlyArray = detailData?["hourly"].array
         else { fatalError() }
         
@@ -100,16 +101,9 @@ extension DetailWeatherVC: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 148
+        // DetailWeatherCollectionViewCell 의 ContentView's heght 가 130 이며 CollectionView의 UIEdgeInsets가 top + bottom 이 32 이므로 최소 크기로 130 + 32를 선언해줘야한다. 만약 이보다 작은 경우 'The behavior of the UICollectionViewFlowLayout is not defined' Warning이 발생한다.
+        return 130 + 32
     }
-    
-//    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-//
-//        guard let cell = cell as? DetailWeatherBodyCell2,
-//              let hourlyArray = detailData?["hourly"].array else { return }
-//
-//        cell.config(hourly: hourlyArray)
-//    }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         
