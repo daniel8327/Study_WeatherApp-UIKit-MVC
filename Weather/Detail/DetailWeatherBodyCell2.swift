@@ -21,7 +21,7 @@ class DetailWeatherBodyCell2: UITableViewCell {
         collectionView.register(UINib(nibName: DetailWeatherCollectionViewCell.reusableIdentifier, bundle: nil), forCellWithReuseIdentifier: DetailWeatherCollectionViewCell.reusableIdentifier) // ui base
         
         // Add `coolectionView` to display hierarchy and setup its appearance
-        self.addSubview(collectionView)
+        self.contentView.addSubview(collectionView) // self.addSubview(collectionView) 햐게되면 컬렉션의 스크롤이 안먹음✭✭✭✭✭✭✭✭✭✭✭✭✭✭✭✭
         
         collectionView.contentInsetAdjustmentBehavior = .always
         
