@@ -7,11 +7,10 @@
 
 import UIKit
 
-class DetailWeatherFooterTableViewCell: UITableViewCell {
+class DetailWeatherBodyDailyCell: UITableViewCell {
     
     @IBOutlet weak var dt: UILabel!
     @IBOutlet weak var icon: UIImageView!
-    @IBOutlet weak var weatherId: UILabel!
     @IBOutlet weak var rainExpectation: UILabel!
     @IBOutlet weak var max: UILabel!
     @IBOutlet weak var min: UILabel!

@@ -1,5 +1,5 @@
 //
-//  DetailWeatherBodyCell2.swift
+//  DetailWeatherBodyHourlyCell2.swift
 //  Weather
 //
 //  Created by moonkyoochoi on 2021/04/22.
@@ -9,7 +9,17 @@ import UIKit
 
 import SwiftyJSON
 
-class DetailWeatherBodyCell2: UITableViewCell {
+class DetailWeatherBodyHourlyCell2: UITableViewCell {
+    
+    private var dateFormatter: DateFormatter = {
+       
+        let df = DateFormatter()
+        df.calendar = Calendar(identifier: .iso8601)
+        df.timeZone = TimeZone.current
+        df.locale = Locale.current
+        df.dateFormat = "HH"
+        return df
+    }()
     
     private lazy var collectionView: UICollectionView = {
        
@@ -17,8 +27,8 @@ class DetailWeatherBodyCell2: UITableViewCell {
         
         collectionView.isUserInteractionEnabled = true
         
-        //collectionView.register(DetailWeatherCollectionViewCell.self, forCellWithReuseIdentifier: DetailWeatherCollectionViewCell.reusableIdentifier) // code base
-        collectionView.register(UINib(nibName: DetailWeatherCollectionViewCell.reusableIdentifier, bundle: nil), forCellWithReuseIdentifier: DetailWeatherCollectionViewCell.reusableIdentifier) // ui base
+        //collectionView.register(DetailWeatherBodyHourlyCollectionViewCell.self, forCellWithReuseIdentifier: DetailWeatherBodyHourlyCollectionViewCell.reusableIdentifier) // code base
+        collectionView.register(UINib(nibName: DetailWeatherBodyHourlyCollectionViewCell.reusableIdentifier, bundle: nil), forCellWithReuseIdentifier: DetailWeatherBodyHourlyCollectionViewCell.reusableIdentifier) // ui base
         
         // Add `coolectionView` to display hierarchy and setup its appearance
         self.contentView.addSubview(collectionView) // self.addSubview(collectionView) 햐게되면 컬렉션의 스크롤이 안먹음✭✭✭✭✭✭✭✭✭✭✭✭✭✭✭✭
@@ -33,7 +43,7 @@ class DetailWeatherBodyCell2: UITableViewCell {
         collectionView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: 0).isActive = true
         
         collectionView.showsHorizontalScrollIndicator = false
-        collectionView.backgroundColor = .yellow
+        collectionView.backgroundColor = .systemBackground
         
         return collectionView
     }()
@@ -60,41 +70,48 @@ class DetailWeatherBodyCell2: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private var hourly: [JSON]?
+    private var hourly: HourlyVO?
     
     override func awakeFromNib() {
         super.awakeFromNib()
     }
     
-    func setHourly(hourly: [JSON]) {
+    func setHourly(hourly: HourlyVO) {
+        
         self.hourly = hourly
         collectionView.dataSource = self
     }
 }
 
-extension DetailWeatherBodyCell2: UICollectionViewDataSource {
+extension DetailWeatherBodyHourlyCell2: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return hourly?.count ?? 0
+        return hourly?.items.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DetailWeatherCollectionViewCell.reusableIdentifier, for: indexPath) as? DetailWeatherCollectionViewCell,
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DetailWeatherBodyHourlyCollectionViewCell.reusableIdentifier, for: indexPath) as? DetailWeatherBodyHourlyCollectionViewCell,
               let hourly = hourly
         else { fatalError() }
         
-        let data = hourly[indexPath.row]
+        let data = hourly.items[indexPath.row]
         
-        cell.dt.text = data["dt"].stringValue
-        cell.temp.text = data["temp"].stringValue
-    
-        if let icon = data["weather"][0]["icon"].string {
-            //print("icon: \(icon)")
-            cell.icon.kf.setImage(with: URL(string: "http://openweathermap.org/img/wn/\(icon)@2x.png"))
-        }
+        let timeInterval = TimeInterval(data.dt)
+        let date = Date(timeIntervalSince1970: timeInterval)
         
-        cell.backgroundColor = .random
+        cell.dt.text = dateFormatter.string(from: date)
+        cell.temp.text = "\(Int(data.temp))"
+        
+        cell.icon.image = UIImage(named: "dash.png")
+        
+        let iconURL = "http://openweathermap.org/img/wn/\(data.weather[0].icon)@2x.png"
+        
+        //print("icon: \(iconURL)")
+        cell.icon.kf.setImage(with: URL(string: iconURL))
+        //cell.icon.kf.setImage(with: URL(string: iconURL))
+        
+        //cell.backgroundColor = .random
         
         return cell
     }

@@ -10,7 +10,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="DetailWeatherFooterTableViewCell" rowHeight="56" id="NY9-8j-76N" customClass="DetailWeatherFooterTableViewCell" customModule="Weather" customModuleProvider="target">
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="DetailWeatherBodyDailyCell" rowHeight="56" id="NY9-8j-76N" customClass="DetailWeatherBodyDailyCell" customModule="Weather" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="414" height="56"/>
             <autoresizingMask key="autoresizingMask"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="NY9-8j-76N" id="x70-AH-Iiy">
@@ -19,12 +19,6 @@
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="월요일" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Zm-WD-QRR">
                         <rect key="frame" x="16" y="19" width="39" height="18"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                        <nil key="textColor"/>
-                        <nil key="highlightedColor"/>
-                    </label>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="맑음" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FOq-mG-JxC">
-                        <rect key="frame" x="194" y="19" width="26" height="18"/>
                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -60,16 +54,14 @@
                     <constraint firstItem="vja-yl-8NG" firstAttribute="centerY" secondItem="haN-LD-MhL" secondAttribute="centerY" id="1YJ-gY-aEx"/>
                     <constraint firstAttribute="bottom" secondItem="haN-LD-MhL" secondAttribute="bottom" constant="8" id="3Iq-J8-EHS"/>
                     <constraint firstItem="haN-LD-MhL" firstAttribute="centerY" secondItem="x70-AH-Iiy" secondAttribute="centerY" id="4IE-bF-2hb"/>
-                    <constraint firstItem="FOq-mG-JxC" firstAttribute="centerY" secondItem="0Zm-WD-QRR" secondAttribute="centerY" id="57o-2r-eUf"/>
-                    <constraint firstItem="FOq-mG-JxC" firstAttribute="centerY" secondItem="x70-AH-Iiy" secondAttribute="centerY" id="7OB-4M-0WS"/>
                     <constraint firstItem="mhw-0Q-TbI" firstAttribute="centerY" secondItem="vja-yl-8NG" secondAttribute="centerY" id="BAO-La-GmF"/>
-                    <constraint firstItem="lb0-bG-YMT" firstAttribute="leading" secondItem="haN-LD-MhL" secondAttribute="trailing" constant="8" id="HdI-GW-yLS"/>
                     <constraint firstItem="mhw-0Q-TbI" firstAttribute="leading" secondItem="vja-yl-8NG" secondAttribute="trailing" constant="16" id="LSP-YV-0kd"/>
                     <constraint firstItem="0Zm-WD-QRR" firstAttribute="leading" secondItem="x70-AH-Iiy" secondAttribute="leading" constant="16" id="WbU-ZI-lH6"/>
                     <constraint firstItem="haN-LD-MhL" firstAttribute="centerX" secondItem="x70-AH-Iiy" secondAttribute="centerX" id="i0B-rv-WfR"/>
-                    <constraint firstItem="FOq-mG-JxC" firstAttribute="centerX" secondItem="x70-AH-Iiy" secondAttribute="centerX" id="iTO-gL-eYd"/>
                     <constraint firstItem="lb0-bG-YMT" firstAttribute="centerY" secondItem="haN-LD-MhL" secondAttribute="centerY" id="jJg-Va-diB"/>
+                    <constraint firstItem="0Zm-WD-QRR" firstAttribute="centerY" secondItem="haN-LD-MhL" secondAttribute="centerY" id="p0u-O4-eVk"/>
                     <constraint firstAttribute="trailing" secondItem="mhw-0Q-TbI" secondAttribute="trailing" constant="16" id="shs-tg-314"/>
+                    <constraint firstItem="lb0-bG-YMT" firstAttribute="leading" secondItem="haN-LD-MhL" secondAttribute="trailing" constant="8" symbolic="YES" id="tJ4-Vl-bar"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
@@ -78,7 +70,6 @@
                 <outlet property="max" destination="vja-yl-8NG" id="Oqr-FW-fAy"/>
                 <outlet property="min" destination="mhw-0Q-TbI" id="4pu-A4-vJ7"/>
                 <outlet property="rainExpectation" destination="lb0-bG-YMT" id="9Ks-F3-KOx"/>
-                <outlet property="weatherId" destination="FOq-mG-JxC" id="sXD-ib-R1J"/>
             </connections>
             <point key="canvasLocation" x="-139.13043478260872" y="-46.875"/>
         </tableViewCell>

@@ -9,7 +9,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="DetailWeatherBodyCell" rowHeight="630" id="vd9-fn-H2U" customClass="DetailWeatherBodyCell" customModule="Weather" customModuleProvider="target">
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="DetailWeatherBodyHourlyCell" rowHeight="630" id="vd9-fn-H2U" customClass="DetailWeatherBodyHourlyCell" customModule="Weather" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="791" height="630"/>
             <autoresizingMask key="autoresizingMask"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="vd9-fn-H2U" id="wS7-5c-FF7">

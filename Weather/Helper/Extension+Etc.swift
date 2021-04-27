@@ -89,3 +89,37 @@ extension NSObject {
         return String(describing: self)
     }
 }
+
+extension Date {
+    func calcuateGMT(time: Int) -> String {
+        let timeZone = abs(time) / 3600
+        let compare = time < 0 ? "-" : "+"
+
+        if timeZone < 10 {
+            return "GMT\(compare)0\(timeZone)"
+        } else {
+            return "GMT\(compare)\(timeZone)"
+        }
+    }
+    
+    func getCountryTime(byTimeZone time: Int) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm a"
+        formatter.timeZone = TimeZone(abbreviation: calcuateGMT(time: time))
+        let defaultTimeZoneStr = formatter.string(from: self)
+        return defaultTimeZoneStr
+    }
+    
+    func getCountryTime2(dt time: Int) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH"
+        formatter.timeZone = TimeZone(abbreviation: calcuateGMT(time: time))
+        let defaultTimeZoneStr = formatter.string(from: self)
+        return defaultTimeZoneStr
+    }
+    
+    func convert(from initTimeZone: TimeZone, to targetTimeZone: TimeZone) -> Date {
+        let delta = TimeInterval(initTimeZone.secondsFromGMT() - targetTimeZone.secondsFromGMT())
+        return addingTimeInterval(delta)
+    }
+}

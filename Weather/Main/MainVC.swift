@@ -340,32 +340,6 @@ class MainVC: UIViewController {
             }
     }
 }
-extension Date {
-    
-    func calcuateGMT(time: Int) -> String {
-        let timeZone = abs(time) / 3600
-        let compare = time < 0 ? "-" : "+"
-
-        if timeZone < 10 {
-            return "GMT\(compare)0\(timeZone)"
-        } else {
-            return "GMT\(compare)\(timeZone)"
-        }
-    }
-    
-    func getCountryTime(byTimeZone time: Int) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm a"
-        formatter.timeZone = TimeZone(abbreviation: calcuateGMT(time: time))
-        let defaultTimeZoneStr = formatter.string(from: self)
-        return defaultTimeZoneStr
-    }
-    
-    func convert(from initTimeZone: TimeZone, to targetTimeZone: TimeZone) -> Date {
-        let delta = TimeInterval(initTimeZone.secondsFromGMT() - targetTimeZone.secondsFromGMT())
-        return addingTimeInterval(delta)
-    }
-}
 
 extension MainVC: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -377,7 +351,7 @@ extension MainVC: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "WeatherCell") as? WeatherCell
         else { fatalError() }
         
-        cell.backgroundColor = .random
+        //cell.backgroundColor = .random
         //cell.contentView.setCardView()
         UICommon.roundCorners(view: cell.contentView, corners: [.allCorners], size: 10)
         cell.separatorInset = UIEdgeInsets.zero // https://zeddios.tistory.com/235
@@ -476,6 +450,7 @@ extension MainVC: UITableViewDelegate {
             locations.remove(at: indexPath.row)
         }
     }
+    
     func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
         
         let object = locations[indexPath.row]
@@ -497,7 +472,7 @@ extension MainVC: CLLocationManagerDelegate {
             
             let headerView = UINib(nibName: "WeatherCell", bundle: nil).instantiate(withOwner: self, options: [:]).first as! WeatherCell
             headerView.frame.size.height = 100
-            headerView.backgroundColor = .random
+            //headerView.backgroundColor = .random
             self.tableView.tableHeaderView = headerView
             
             self.setHeaderView()

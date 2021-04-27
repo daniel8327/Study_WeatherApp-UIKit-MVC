@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="75" id="gx6-Mk-P8G">
+            <rect key="frame" x="0.0" y="0.0" width="397" height="72"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="gx6-Mk-P8G" id="chf-SM-82j">
+                <rect key="frame" x="0.0" y="0.0" width="397" height="72"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="OSG-Eo-jkm">
+                        <rect key="frame" x="0.0" y="0.0" width="397" height="72"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WuJ-hz-ugZ">
+                                <rect key="frame" x="0.0" y="0.0" width="198.5" height="72"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="일출" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Shn-dt-QAw">
+                                        <rect key="frame" x="16" y="8" width="29.5" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="05:41" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="o0v-da-jtb">
+                                        <rect key="frame" x="16" y="36.5" width="57.5" height="27.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="23"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstItem="o0v-da-jtb" firstAttribute="leading" secondItem="Shn-dt-QAw" secondAttribute="leading" id="0ha-XN-yPd"/>
+                                    <constraint firstAttribute="bottom" secondItem="o0v-da-jtb" secondAttribute="bottom" constant="8" id="6Pi-dK-HZ2"/>
+                                    <constraint firstItem="Shn-dt-QAw" firstAttribute="leading" secondItem="WuJ-hz-ugZ" secondAttribute="leading" constant="16" id="HYf-jE-Mvc"/>
+                                    <constraint firstItem="o0v-da-jtb" firstAttribute="top" secondItem="Shn-dt-QAw" secondAttribute="bottom" constant="8" id="K9h-zr-kps"/>
+                                    <constraint firstItem="Shn-dt-QAw" firstAttribute="top" secondItem="WuJ-hz-ugZ" secondAttribute="top" constant="8" id="lDK-Sf-Ea1"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6VR-fS-vVO">
+                                <rect key="frame" x="198.5" y="0.0" width="198.5" height="72"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="일출" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fCS-OM-X3b">
+                                        <rect key="frame" x="0.0" y="8" width="29.5" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="05:41" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oz3-jo-xfl">
+                                        <rect key="frame" x="0.0" y="36.5" width="57.5" height="27.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="23"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstItem="fCS-OM-X3b" firstAttribute="top" secondItem="6VR-fS-vVO" secondAttribute="top" constant="8" id="6GJ-jh-VJB"/>
+                                    <constraint firstItem="oz3-jo-xfl" firstAttribute="leading" secondItem="fCS-OM-X3b" secondAttribute="leading" id="PiF-gu-beO"/>
+                                    <constraint firstItem="fCS-OM-X3b" firstAttribute="leading" secondItem="6VR-fS-vVO" secondAttribute="leading" id="fD9-qL-wTG"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="oz3-jo-xfl" firstAttribute="centerY" secondItem="o0v-da-jtb" secondAttribute="centerY" id="TOM-Te-gTw"/>
+                        </constraints>
+                    </stackView>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="OSG-Eo-jkm" secondAttribute="bottom" id="9uq-yq-nPx"/>
+                    <constraint firstItem="OSG-Eo-jkm" firstAttribute="leading" secondItem="chf-SM-82j" secondAttribute="leading" id="Aql-N3-eQS"/>
+                    <constraint firstAttribute="trailing" secondItem="OSG-Eo-jkm" secondAttribute="trailing" id="Mvc-EB-rz3"/>
+                    <constraint firstItem="OSG-Eo-jkm" firstAttribute="top" secondItem="chf-SM-82j" secondAttribute="top" id="hyc-xF-FJT"/>
+                </constraints>
+            </tableViewCellContentView>
+            <point key="canvasLocation" x="-1381.8840579710145" y="-496.20535714285711"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

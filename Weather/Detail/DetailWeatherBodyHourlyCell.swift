@@ -1,5 +1,5 @@
 //
-//  DetailWeatherBodyCell.swift
+//  DetailWeatherBodyHourlyCell.swift
 //  Weather
 //
 //  Created by moonkyoochoi on 2021/04/22.
@@ -11,7 +11,18 @@ import Kingfisher
 import SwiftyJSON
 
 
-class DetailWeatherBodyCell: UITableViewCell {
+class DetailWeatherBodyHourlyCell: UITableViewCell {
+    
+    private var dateFormatter: DateFormatter = {
+       
+        let df = DateFormatter()
+        df.calendar = Calendar(identifier: .iso8601)
+        df.timeZone = TimeZone.current
+        df.locale = Locale.current
+        df.dateFormat = "HH"
+        return df
+    }()
+    
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var collectionLayout: UICollectionViewFlowLayout! {
         didSet {
@@ -20,12 +31,13 @@ class DetailWeatherBodyCell: UITableViewCell {
         }
     }
     
-    private var hourly: [JSON]?
+    private var hourly: HourlyVO?
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         
-        //collectionView.register(DetailWeatherCollectionViewCell.self, forCellWithReuseIdentifier: "DetailWeatherCollectionViewCell") // code base
-        collectionView.register(UINib(nibName: DetailWeatherCollectionViewCell.reusableIdentifier, bundle: nil), forCellWithReuseIdentifier: DetailWeatherCollectionViewCell.reusableIdentifier) // ui base
+        //collectionView.register(DetailWeatherBodyHourlyCollectionViewCell.self, forCellWithReuseIdentifier: "DetailWeatherBodyHourlyCollectionViewCell") // code base
+        collectionView.register(UINib(nibName: DetailWeatherBodyHourlyCollectionViewCell.reusableIdentifier, bundle: nil), forCellWithReuseIdentifier: DetailWeatherBodyHourlyCollectionViewCell.reusableIdentifier) // ui base
         
         let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
         layout.scrollDirection = .horizontal
@@ -47,44 +59,43 @@ class DetailWeatherBodyCell: UITableViewCell {
         //layout.invalidateLayout()
     }
     
-    func setHourly(hourly: [JSON]) {
+    func setHourly(hourly: HourlyVO) {
         
         self.hourly = hourly
-        
         collectionView.dataSource = self
         
     }
 }
 
-extension DetailWeatherBodyCell: UICollectionViewDataSource {
+extension DetailWeatherBodyHourlyCell: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return hourly?.count ?? 0
+        return hourly?.items.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DetailWeatherCollectionViewCell.reusableIdentifier, for: indexPath) as? DetailWeatherCollectionViewCell,
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DetailWeatherBodyHourlyCollectionViewCell.reusableIdentifier, for: indexPath) as? DetailWeatherBodyHourlyCollectionViewCell,
               let hourly = hourly
         else { fatalError() }
         
-        let data = hourly[indexPath.row]
+        let data = hourly.items[indexPath.row]
         
-        cell.dt.text = data["dt"].stringValue
-        cell.temp.text = data["temp"].stringValue
+        let timeInterval = TimeInterval(data.dt)
+        let date = Date(timeIntervalSince1970: timeInterval)
+        
+        cell.dt.text = dateFormatter.string(from: date)
+        cell.temp.text = "\(Int(data.temp))"
         
         cell.icon.image = UIImage(named: "dash.png")
-    
-        if let icon = data["weather"][0]["icon"].string {
-            
-            let iconURL = "http://openweathermap.org/img/wn/\(icon)@2x.png"
-            
-            //print("icon: \(iconURL)")
-            cell.icon.kf.setImage(with: URL(string: iconURL))
-            //cell.icon.kf.setImage(with: URL(string: iconURL))
-        }
         
-        cell.backgroundColor = .random
+        let iconURL = "http://openweathermap.org/img/wn/\(data.weather[0].icon)@2x.png"
+        
+        //print("icon: \(iconURL)")
+        cell.icon.kf.setImage(with: URL(string: iconURL))
+        //cell.icon.kf.setImage(with: URL(string: iconURL))
+        
+        //cell.backgroundColor = .random
         
         return cell
     }

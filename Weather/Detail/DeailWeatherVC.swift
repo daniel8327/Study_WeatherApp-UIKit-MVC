@@ -17,7 +17,21 @@ class DetailWeatherVC: UIViewController {
     var locationName: String
     
     //var detailData: DetailData?
-    var detailData: JSON?
+    var detailData: DetailData?
+    
+    var items: [JSONVO]?
+    
+    private var dateFormatter: DateFormatter = {
+       
+        let df = DateFormatter()
+        df.calendar = Calendar(identifier: .iso8601)
+        df.timeZone = TimeZone.current
+        df.locale = Locale.current
+        //df.locale = Locale(identifier: "ko_KR")
+        df.dateFormat = "EEEE"
+        return df
+    }()
+    
     
     init(locationName: String, location: CLLocation) {
         self.locationName = locationName
@@ -39,15 +53,21 @@ class DetailWeatherVC: UIViewController {
         tbv.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tbv.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         tbv.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        //tbv.backgroundColor = .red
+        //tbv.backgroundColor = .random
         
-        tbv.register(UINib(nibName: "DetailWeatherHeaderCell", bundle: nil), forHeaderFooterViewReuseIdentifier: "DetailWeatherHeaderCell")
-//        tbv.register(UINib(nibName: DetailWeatherBodyCell.reusableIdentifier, bundle: nil), forCellReuseIdentifier: DetailWeatherBodyCell.reusableIdentifier) // ui base
-        tbv.register(DetailWeatherBodyCell2.self, forCellReuseIdentifier: DetailWeatherBodyCell2.reusableIdentifier) // code base
-        //tbv.register(UINib(nibName: "DetailWeatherFooterCell", bundle: nil), forHeaderFooterViewReuseIdentifier: "DetailWeatherFooterCell")
-        tbv.register(DetailWeatherFooterCell.self, forCellReuseIdentifier: DetailWeatherFooterCell.reusableIdentifier)
+        //tbv.register(UINib(nibName: "DetailWeatherHeaderCell", bundle: nil), forHeaderFooterViewReuseIdentifier: "DetailWeatherHeaderCell")
+        tbv.register(UINib(nibName: DetailWeatherHeaderCell.reusableIdentifier, bundle: nil), forHeaderFooterViewReuseIdentifier: DetailWeatherHeaderCell.reusableIdentifier)
         
-        tbv.separatorStyle = .none
+        
+//        tbv.register(UINib(nibName: DetailWeatherBodyHourlyCell.reusableIdentifier, bundle: nil), forCellReuseIdentifier: DetailWeatherBodyHourlyCell.reusableIdentifier) // ui base
+        tbv.register(DetailWeatherBodyHourlyCell2.self, forCellReuseIdentifier: DetailWeatherBodyHourlyCell2.reusableIdentifier) // code base
+        
+        
+        tbv.register(UINib(nibName: DetailWeatherBodyDailyCell.reusableIdentifier, bundle: nil), forCellReuseIdentifier: DetailWeatherBodyDailyCell.reusableIdentifier) // code base
+        
+        //tbv.separatorStyle = .none
+        tbv.allowsSelection = false
+        tbv.showsVerticalScrollIndicator = false
         
         return tbv
         
@@ -65,92 +85,163 @@ class DetailWeatherVC: UIViewController {
                 
                 //print(JSON(json))
                 
-//                do {
-//                    self.detailData = try JSONDecoder().decode(DetailData.self, from: json.rawData())
-//
-//                    self.tableView.dataSource = self
-//                    self.tableView.delegate = self
-//                } catch let error {
-//                    print(error.localizedDescription)
-//                }
+                do {
+                    self.detailData = try JSONDecoder().decode(DetailData.self, from: json.rawData())
+                    
+                    if let data = self.detailData {
+                        
+                        self.items = [JSONVO]()
+                        self.items?.append(HourlyVO(items: data.hourly))
+                        self.items?.append(DailyVO(items: data.daily))
+                        
+                        self.setHeader()
+                    }
+                } catch let error {
+                    print(error)
+                    print(error.localizedDescription)
+                    fatalError()
+                }
                 
-                self.detailData = json
                 self.tableView.dataSource = self
                 self.tableView.delegate = self
             }
+    }
+    
+    func setHeader() {
+        
+        guard let header = UINib(nibName: DetailWeatherHeaderCell.reusableIdentifier, bundle: nil)
+                .instantiate(withOwner: self, options: [:])[0] as? DetailWeatherHeaderCell,
+              let data = self.detailData
+        else { fatalError() }
+        
+        header.city.text = self.locationName
+        header.weatherDescription.text = data.current.weather[0].weatherDescription
+        header.temp.text = "\(Int(data.current.temp))"
+        
+        header.max.text = "_\(fahrenheitOrCelsius.emoji)"
+        header.min.text = "_\(fahrenheitOrCelsius.emoji)"
+        
+        header.max.text = "\(Int(data.daily[0].temp.max))"
+        header.min.text = "\(Int(data.daily[0].temp.min))"
+        
+        tableView.tableHeaderView = header
     }
 }
 
 extension DetailWeatherVC: UITableViewDataSource {
     
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return items?.count ?? 0
+    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return detailData == nil ? 0 : 1
+    
+        if let hourly = items?[section] as? HourlyVO {
+            print("hourly count: \(hourly.items.count)")
+            return 1
+        } else if let daily = items?[section] as? DailyVO {
+            print("daily count: \(daily.items.count)")
+            return daily.items.count
+        } else {
+            fatalError()
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-//        guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailWeatherBodyCell.reusableIdentifier) as? DetailWeatherBodyCell,
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailWeatherBodyCell2.reusableIdentifier) as? DetailWeatherBodyCell2,
-              let hourlyArray = detailData?["hourly"].array
-        else { fatalError() }
+        if indexPath.section == 0 {
+    //        guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailWeatherBodyHourlyCell.reusableIdentifier) as? DetailWeatherBodyHourlyCell,
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailWeatherBodyHourlyCell2.reusableIdentifier) as? DetailWeatherBodyHourlyCell2,
+                  let hourly = items?[indexPath.section] as? HourlyVO
+            else { fatalError() }
         
-        cell.setHourly(hourly: hourlyArray)
+            cell.setHourly(hourly: hourly)
+            cell.separatorInset = UIEdgeInsets.zero // https://zeddios.tistory.com/235
+            return cell
+        }
         
-        return cell
+        else {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: DetailWeatherBodyDailyCell.reusableIdentifier) as? DetailWeatherBodyDailyCell,
+                  let daily = items?[indexPath.section] as? DailyVO
+            else { fatalError() }
+            
+            let data = daily.items[indexPath.row]
+            
+            
+            let timeInterval = TimeInterval(data.dt)
+            let date = Date(timeIntervalSince1970: timeInterval)
+            
+            cell.dt.text = dateFormatter.string(from: date)
+            
+            cell.icon.image = UIImage(named: "dash.png")
+            
+            let iconURL = "http://openweathermap.org/img/wn/\(data.weather[0].icon)@2x.png"
+            
+            //print("icon: \(iconURL)")
+            cell.icon.kf.setImage(with: URL(string: iconURL))
+            //cell.weatherId.text = "\(data.weather[0].id)"
+            cell.rainExpectation.text = data.humidity > 30 ? "\(data.humidity)" : ""
+            cell.max.text = "\(Int(data.temp.max))"
+            cell.min.text = "\(Int(data.temp.min))"
+            
+            cell.separatorInset = UIEdgeInsets.zero // https://zeddios.tistory.com/235
+            return cell
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        // DetailWeatherCollectionViewCell 의 ContentView's heght 가 130 이며 CollectionView의 UIEdgeInsets가 top + bottom 이 32 이므로 최소 크기로 130 + 32를 선언해줘야한다. 만약 이보다 작은 경우 'The behavior of the UICollectionViewFlowLayout is not defined' Warning이 발생한다.
-        return 130 + 32
+        // DetailWeatherBodyHourlyCollectionViewCell 의 ContentView's heght 가 130 이며 CollectionView의 UIEdgeInsets가 top + bottom 이 32 이므로 최소 크기로 130 + 32를 선언해줘야한다. 만약 이보다 작은 경우 'The behavior of the UICollectionViewFlowLayout is not defined' Warning이 발생한다.
+        //return 130 + 32
+        if indexPath.section == 0 {
+            return 130 + 32
+        }
+        return UITableView.automaticDimension
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        
-        guard let header = UINib(nibName: "DetailWeatherHeaderCell", bundle: nil)
-                .instantiate(withOwner: self, options: [:])[0] as? DetailWeatherHeaderCell
-        else { return nil }
-        /*
-         
-         @IBOutlet weak var city: UILabel!
-         @IBOutlet weak var weatherDescription: UILabel!
-         @IBOutlet weak var temp: UILabel!
-         @IBOutlet weak var max: UILabel!
-         @IBOutlet weak var min: UILabel!
-         */
-        header.city.text = self.locationName
-        header.weatherDescription.text = detailData?["current"]["weather"].stringValue
-        header.temp.text = detailData?["current"]["temp"].stringValue
-        
-        header.max.text = "_\(fahrenheitOrCelsius.emoji)"
-        header.min.text = "_\(fahrenheitOrCelsius.emoji)"
-        
-        guard let temp = detailData?["daily"].array?[0]["temp"]
-        else { return header }
-        
-        header.max.text = "\(temp["max"].intValue)"
-        header.min.text = "\(temp["min"].intValue)"
-        
-        return header
-    }
-    
-    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+//    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
 //
-//        guard let header = UINib(nibName: "DetailWeatherFooterCell", bundle: nil)
-//                .instantiate(withOwner: self, options: [:]).first as? DetailWeatherFooterCell
+//        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: DetailWeatherHeaderCell.reusableIdentifier) as? DetailWeatherHeaderCell
 //        else { return nil }
-        let footer = DetailWeatherFooterCell(style: .default, reuseIdentifier: DetailWeatherFooterCell.reusableIdentifier)
-        
-        guard let dailyArray = detailData?["daily"].array
-        else { return nil }
-        
-        footer.setDaily(daily: dailyArray)
-        return footer
-    }
+//
+////        guard let header = UINib(nibName: "DetailWeatherHeaderCell", bundle: nil)
+////                .instantiate(withOwner: self, options: [:])[0] as? DetailWeatherHeaderCell
+////        else { return nil }
+//        /*
+//
+//         @IBOutlet weak var city: UILabel!
+//         @IBOutlet weak var weatherDescription: UILabel!
+//         @IBOutlet weak var temp: UILabel!
+//         @IBOutlet weak var max: UILabel!
+//         @IBOutlet weak var min: UILabel!
+//         */
+//        header.city.text = self.locationName
+//        header.weatherDescription.text = detailData?["current"]["weather"].stringValue
+//        header.temp.text = detailData?["current"]["temp"].stringValue
+//
+//        header.max.text = "_\(fahrenheitOrCelsius.emoji)"
+//        header.min.text = "_\(fahrenheitOrCelsius.emoji)"
+//
+//        guard let temp = detailData?["daily"].array?[0]["temp"]
+//        else { return header }
+//
+//        header.max.text = "\(temp["max"].intValue)"
+//        header.min.text = "\(temp["min"].intValue)"
+//
+//        return header
+//    }
     
-    func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
-        return 200
-    }
+//    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+//        let footer = DetailWeatherFooterCell(style: .default, reuseIdentifier: DetailWeatherFooterCell.reusableIdentifier)
+//
+//        guard let dailyArray = detailData?["daily"].array
+//        else { return nil }
+//
+//        footer.setDaily(daily: dailyArray)
+//        return footer
+//    }
+    
+    
+    
     
 }
 
