@@ -69,19 +69,13 @@ struct Rain: Codable {
 struct Weather: Codable {
     let icon: String
     let id: Int
-    let main: Main
+    let main: String
     let weatherDescription: String
 
     enum CodingKeys: String, CodingKey {
         case icon, id, main
         case weatherDescription = "description"
     }
-}
-
-enum Main: String, Codable {
-    case clear = "Clear"
-    case clouds = "Clouds"
-    case rain = "Rain"
 }
 
 // MARK: - Daily

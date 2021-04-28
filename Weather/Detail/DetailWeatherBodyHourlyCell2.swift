@@ -16,8 +16,9 @@ class DetailWeatherBodyHourlyCell2: UITableViewCell {
         let df = DateFormatter()
         df.calendar = Calendar(identifier: .iso8601)
         df.timeZone = TimeZone.current
-        df.locale = Locale.current
-        df.dateFormat = "HH"
+        df.locale = Locale(identifier: UICommon.getLanguageCountryCode())
+        print(Locale.current)
+        df.dateFormat = "H a"
         return df
     }()
     

@@ -26,7 +26,9 @@ class DetailWeatherVC: UIViewController {
         let df = DateFormatter()
         df.calendar = Calendar(identifier: .iso8601)
         df.timeZone = TimeZone.current
-        df.locale = Locale.current
+        //df.locale = Locale.current
+        df.locale = Locale(identifier: UICommon.getLanguageCountryCode())
+
         //df.locale = Locale(identifier: "ko_KR")
         df.dateFormat = "EEEE"
         return df
@@ -144,6 +146,15 @@ extension DetailWeatherVC: UITableViewDataSource {
             return daily.items.count
         } else {
             fatalError()
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        cell.alpha = 0
+        cell.layer.transform = CATransform3DMakeScale(0.5, 0.5, 0.5)
+        UIView.animate(withDuration: 0.5, delay: 0.2 * Double(indexPath.row)) {
+            cell.alpha = 1
+            cell.layer.transform = CATransform3DScale(CATransform3DIdentity, 1, 1, 1)
         }
     }
     

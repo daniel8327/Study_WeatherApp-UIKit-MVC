@@ -27,7 +27,7 @@ class API {
     func request(_ convertible: Alamofire.URLConvertible, method: Alamofire.HTTPMethod, parameters: Alamofire.Parameters?, encoding: Alamofire.ParameterEncoding, headers: Alamofire.HTTPHeaders?, interceptor: Alamofire.RequestInterceptor?, requestModifier: Alamofire.Session.RequestModifier?, completionHandler: @escaping (JSON) -> Void) {
         _SI.startAnimating()
 
-        //print("path: \(convertible)\nparam: \(parameters)")
+        print("path: \(convertible)\nparam: \(parameters)")
 
         sessionManager.request(convertible, method: method, parameters: parameters, encoding: encoding, headers: headers, interceptor: interceptor, requestModifier: requestModifier)
             .responseJSON(completionHandler: { response in

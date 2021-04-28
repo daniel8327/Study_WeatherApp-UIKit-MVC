@@ -8,6 +8,9 @@
 import MapKit
 import UIKit
 
+import Alamofire
+import SwiftyJSON
+
 typealias SaveLocationAlias = ([String]) -> Void
 protocol SaveLocationDelegate: class { func requestSave(locationElements: [String]) }
 
@@ -144,17 +147,38 @@ extension AddLocationVC: UITableViewDelegate {
                 print(error?.localizedDescription)
                 return
             }
+            
+            print("response: \(response)")
             guard let placeMark = response?.mapItems[0].placemark else {
                 return
             }
-            
-            // CoreData 저장 델리게이트 SaveLocationDelegate
-            self.saveDelegate?.requestSave(locationElements: [placeMark.title ?? "", "", placeMark.coordinate.longitude.description, placeMark.coordinate.latitude.description])
-                
             print("placeMark : \(placeMark)")
-//            let coordinate = Coordinate(coordinate: placeMark.coordinate)
-//            self.delegate?.userAdd(newLocation: Location(coordinate: coordinate, name: "\(placeMark.locality ?? selectedResult.title)"))
-            self.dismiss(animated: true, completion: nil)
+            
+            let param: [String: Any] = ["lat": placeMark.coordinate.latitude.description,
+                                        "lon": placeMark.coordinate.longitude.description,
+                                        "appid": "0367480f207592a2a18d028adaac65d2",
+                                        "lang": _COUNTRY,
+                                        "units": fahrenheitOrCelsius.pameter] //imperial - Fahrenheit
+            
+            API.init(session: Session.default)
+                .request("https://api.openweathermap.org/data/2.5/weather",
+                         method: .get,
+                         parameters: param,
+                         encoding: URLEncoding.default,
+                         headers: nil,
+                         interceptor: nil,
+                         requestModifier: nil) { json in
+                    
+                    
+                
+                    // CoreData 저장 델리게이트 SaveLocationDelegate
+                    self.saveDelegate?.requestSave(locationElements: [placeMark.title ?? json["name"].stringValue,
+                                                                      json["id"].stringValue,
+                                                                      json["coord"]["lon"].stringValue,
+                                                                      json["coord"]["lat"].stringValue])
+                    
+                    self.dismiss(animated: true, completion: nil)
+                }
         }
     }
 }

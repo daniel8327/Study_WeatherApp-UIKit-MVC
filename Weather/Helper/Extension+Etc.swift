@@ -104,8 +104,9 @@ extension Date {
     
     func getCountryTime(byTimeZone time: Int) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm a"
+        formatter.dateFormat = "hh:mm a"
         formatter.timeZone = TimeZone(abbreviation: calcuateGMT(time: time))
+        formatter.locale = Locale(identifier: UICommon.getLanguageCountryCode())
         let defaultTimeZoneStr = formatter.string(from: self)
         return defaultTimeZoneStr
     }
