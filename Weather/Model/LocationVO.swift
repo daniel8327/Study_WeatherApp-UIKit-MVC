@@ -8,9 +8,11 @@
 import Foundation
 
 struct LocationVO {
+    let currentArea: Bool
     let city: String
     let code: String
     let longitude: String
     let latitude: String
-    let recent_temp: Int?
+    var recent_temp: Int?
+    let timezone: Int64
 }

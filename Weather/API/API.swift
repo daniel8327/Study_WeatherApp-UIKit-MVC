@@ -55,7 +55,7 @@ class API {
 
                     let json = JSON(responseData)
 
-                    print("path : \(convertible)\njson => \(json)\n")
+                    //print("path : \(convertible)\njson => \(json)\n")
 
                     if !json["cod"].exists() || json["cod"].intValue == 200 {
                         completionHandler(json)

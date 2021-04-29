@@ -11,8 +11,8 @@ import UIKit
 import Alamofire
 import SwiftyJSON
 
-typealias SaveLocationAlias = ([String]) -> Void
-protocol SaveLocationDelegate: class { func requestSave(locationElements: [String]) }
+typealias SaveLocationAlias = (LocationVO) -> Void
+protocol SaveLocationDelegate: class { func requestSave(vo: LocationVO) }
 
 class AddLocationVC: UIViewController {
     
@@ -169,13 +169,21 @@ extension AddLocationVC: UITableViewDelegate {
                          interceptor: nil,
                          requestModifier: nil) { json in
                     
-                    
+                    print("addLocation: \(json)")
                 
                     // CoreData 저장 델리게이트 SaveLocationDelegate
-                    self.saveDelegate?.requestSave(locationElements: [placeMark.title ?? json["name"].stringValue,
-                                                                      json["id"].stringValue,
-                                                                      json["coord"]["lon"].stringValue,
-                                                                      json["coord"]["lat"].stringValue])
+                    self.saveDelegate?
+                        .requestSave(
+                            vo: LocationVO(
+                                currentArea: false,
+                                city: placeMark.title ?? json["name"].stringValue,
+                                code: json["id"].stringValue,
+                                longitude: json["coord"]["lon"].stringValue,
+                                latitude: json["coord"]["lat"].stringValue,
+                                recent_temp: json["main"]["temp"].intValue,
+                                timezone: json["timezone"].int64Value
+                            )
+                        )
                     
                     self.dismiss(animated: true, completion: nil)
                 }

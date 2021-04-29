@@ -151,8 +151,8 @@ extension DetailWeatherVC: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         cell.alpha = 0
-        cell.layer.transform = CATransform3DMakeScale(0.5, 0.5, 0.5)
-        UIView.animate(withDuration: 0.5, delay: 0.2 * Double(indexPath.row)) {
+        cell.layer.transform = CATransform3DMakeScale(0.8, 0.8, 0.8)
+        UIView.animate(withDuration: 0.25, delay: 0.05 * Double(indexPath.row)) {
             cell.alpha = 1
             cell.layer.transform = CATransform3DScale(CATransform3DIdentity, 1, 1, 1)
         }

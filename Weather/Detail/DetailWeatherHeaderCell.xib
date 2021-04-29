@@ -81,6 +81,10 @@
                     <constraint firstItem="CZT-Zh-3BH" firstAttribute="top" secondItem="epq-3l-V5V" secondAttribute="bottom" constant="9" id="u1M-9T-uRo"/>
                     <constraint firstItem="3NE-5Q-prq" firstAttribute="top" secondItem="apt-Wn-u2g" secondAttribute="top" constant="20" id="xtn-9q-4sr"/>
                 </constraints>
+                <userDefinedRuntimeAttributes>
+                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                    <userDefinedRuntimeAttribute type="boolean" keyPath="isHiddenWhenSkeletonIsActive" value="YES"/>
+                </userDefinedRuntimeAttributes>
             </tableViewCellContentView>
             <connections>
                 <outlet property="city" destination="3NE-5Q-prq" id="fNS-fy-HAJ"/>
