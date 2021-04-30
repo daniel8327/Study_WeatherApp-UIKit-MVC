@@ -278,7 +278,7 @@ class MainVC: UIViewController {
         
         let context = _AD.persistentContainer.viewContext
         
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Location")
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "CD_Location")
         
         fetchRequest.predicate = NSPredicate(format: "currentArea == %i", 1)
         
@@ -297,7 +297,7 @@ class MainVC: UIViewController {
         
         let context = _AD.persistentContainer.viewContext
         
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Location")
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "CD_Location")
         
         fetchRequest.predicate = NSPredicate(format: "code == %@", code)
         
@@ -309,7 +309,31 @@ class MainVC: UIViewController {
     func fetch() -> [NSManagedObject] {
         let context = _AD.persistentContainer.viewContext
         
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Location")
+        //test
+        print("current => ")
+        try? _ = context.fetch(NSFetchRequest<NSManagedObject>(entityName: "CD_Current")).map {
+            print($0.value(forKey: "code"))
+            print($0.value(forKey: "temp"))
+            print($0.value(forKey: "weatherDescription"))
+        }
+        print("hourly =>")
+        try? _ = context.fetch(NSFetchRequest<NSManagedObject>(entityName: "CD_Hourly")).map {
+            print($0.value(forKey: "code"))
+            print($0.value(forKey: "dt"))
+            print($0.value(forKey: "icon"))
+            print($0.value(forKey: "temp"))
+        }
+        print("daily =>")
+        try? _ = context.fetch(NSFetchRequest<NSManagedObject>(entityName: "CD_Daily")).map {
+            print($0.value(forKey: "code"))
+            print($0.value(forKey: "dt"))
+            print($0.value(forKey: "humidity"))
+            print($0.value(forKey: "icon"))
+            print($0.value(forKey: "max"))
+            print($0.value(forKey: "min"))
+        }
+        
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "CD_Location")
         
         // 정렬 속성
         do {
@@ -344,6 +368,7 @@ class MainVC: UIViewController {
                     }
                 
                 }, completion: nil)
+            
             }
             
             return result
@@ -444,7 +469,7 @@ class MainVC: UIViewController {
                 
         let context = _AD.persistentContainer.viewContext
         
-        let object = NSEntityDescription.insertNewObject(forEntityName: "Location", into: context)
+        let object = NSEntityDescription.insertNewObject(forEntityName: "CD_Location", into: context)
         
         print("111: de1저장: \(location.city) \(location.currentArea)")
         object.setValue(location.currentArea, forKey: "currentArea")
@@ -475,7 +500,7 @@ class MainVC: UIViewController {
         if nil != object {
             obj = object
         } else {
-            obj = NSEntityDescription.insertNewObject(forEntityName: "Location", into: context)
+            obj = NSEntityDescription.insertNewObject(forEntityName: "CD_Location", into: context)
         }
         
         print("111: 저장: \(location.city) \(location.currentArea)")
@@ -642,9 +667,9 @@ extension MainVC: UITableViewDelegate {
             latitude: CLLocationDegrees(Double(object.latitude)!),
             longitude: CLLocationDegrees(Double(object.longitude)!)
         )
-        
-        let vc = DetailWeatherVC(locationName: object.city, location: location)
-        
+    
+        let vc = DetailWeatherVC(locationName: object.city, locationCode: object.code, location: location)
+    
         UICommon.setTransitionAnimation(navi: self.navigationController)
         self.present(vc, animated: true)
     }
@@ -690,6 +715,8 @@ extension MainVC: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedAlways || status == .authorizedWhenInUse {
+            
+            print(locationManager)
             guard let currentLocation = locationManager.location else { return }
             
             let prevLocation = self.fetchByCurrent()

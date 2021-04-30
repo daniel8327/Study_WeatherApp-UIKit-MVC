@@ -224,7 +224,6 @@
 				64D4E473262B0BD5003DC20A /* Indicator.swift */,
 				64D4E47B262B0C9A003DC20A /* Define.swift */,
 				64D4E48D262B0E04003DC20A /* Common.swift */,
-				CEF4D6B326300FD000CF438D /* DetailData.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -232,6 +231,7 @@
 		CE2B6FBA2638DF25007A7F62 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				CEF4D6B326300FD000CF438D /* DetailData.swift */,
 				CE47CD0726369BAB00600FC3 /* Model.swift */,
 				CE2B6FBB2638DF3B007A7F62 /* LocationVO.swift */,
 			);

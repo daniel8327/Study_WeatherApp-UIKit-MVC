@@ -111,6 +111,7 @@ extension AddLocationVC: MKLocalSearchCompleterDelegate {
         searchResultTable.reloadData()
     }
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
+        print(error)
         print(error.localizedDescription)
     }
 }

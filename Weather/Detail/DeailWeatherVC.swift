@@ -6,6 +6,7 @@
 //
 
 import CoreLocation
+import CoreData
 import UIKit
 
 import Alamofire
@@ -15,6 +16,7 @@ class DetailWeatherVC: UIViewController {
     
     var location: CLLocation
     var locationName: String
+    var locationCode: String
     
     //var detailData: DetailData?
     var detailData: DetailData?
@@ -35,8 +37,9 @@ class DetailWeatherVC: UIViewController {
     }()
     
     
-    init(locationName: String, location: CLLocation) {
+    init(locationName: String, locationCode: String, location: CLLocation) {
         self.locationName = locationName
+        self.locationCode = locationCode
         self.location = location
         super.init(nibName: nil, bundle: nil)
     }
@@ -83,14 +86,20 @@ class DetailWeatherVC: UIViewController {
                                     "lang": _COUNTRY,
                                     "units": fahrenheitOrCelsius.pameter] //imperial - Fahrenheit
         API(session: Session.default)
-            .request("https://api.openweathermap.org/data/2.5/onecall", method: .get, parameters: param, encoding: URLEncoding.default, headers: nil, interceptor: nil, requestModifier: nil) { json in
+            .request("https://api.openweathermap.org/data/2.5/onecall", method: .get, parameters: param, encoding: URLEncoding.default, headers: nil, interceptor: nil, requestModifier: nil) { [weak self] json in
                 
                 //print(JSON(json))
+                
+                // Tx 발생하기때문에 강한 참조로 묶어준다. https://jinsangjin.tistory.com/129 참고
+                guard let self = self else { return }
                 
                 do {
                     self.detailData = try JSONDecoder().decode(DetailData.self, from: json.rawData())
                     
                     if let data = self.detailData {
+                        
+                        self.saveDetails(data)
+                        
                         
                         self.items = [JSONVO]()
                         self.items?.append(HourlyVO(items: data.hourly))
@@ -107,6 +116,46 @@ class DetailWeatherVC: UIViewController {
                 self.tableView.dataSource = self
                 self.tableView.delegate = self
             }
+    }
+    
+    func saveDetails(_ data: DetailData) {
+        
+        let context = _AD.persistentContainer.viewContext
+        
+        let current = NSEntityDescription.insertNewObject(forEntityName: "CD_Current", into: context)
+        let hourly  = NSEntityDescription.insertNewObject(forEntityName: "CD_Hourly", into: context)
+        let daily   = NSEntityDescription.insertNewObject(forEntityName: "CD_Daily", into: context)
+    
+        current.setValue(self.locationCode, forKey: "code")
+        current.setValue(data.current.temp, forKey: "temp")
+        current.setValue(data.current.weather[0].weatherDescription, forKey: "weatherDescription")
+        
+        print("hourly => \(data.hourly.count)")
+        _ = data.hourly.map {
+            print("hourly =>")
+            hourly.setValue(self.locationCode, forKey: "code")
+            hourly.setValue($0.dt, forKey: "dt")
+            hourly.setValue($0.temp, forKey: "temp")
+            hourly.setValue($0.weather[0].icon, forKey: "icon")
+        }
+        
+        print("daily => \(data.daily.count)")
+        _ = data.daily.map {
+            print("daily =>")
+            daily.setValue(self.locationCode, forKey: "code")
+            daily.setValue($0.temp.max, forKey: "max")
+            daily.setValue($0.temp.min, forKey: "min")
+            daily.setValue($0.dt, forKey: "dt")
+            daily.setValue($0.weather[0].icon, forKey: "icon")
+            daily.setValue($0.humidity, forKey: "humidity")
+        }
+        
+        do {
+            try context.save()
+        } catch {
+            context.rollback()
+            return
+        }
     }
     
     func setHeader() {
