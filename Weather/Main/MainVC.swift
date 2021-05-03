@@ -13,41 +13,12 @@ import Alamofire
 import SwiftyJSON
 
 
-enum FahrenheitOrCelsius: String {
-    case Fahrenheit
-    case Celsius
-}
-
-extension FahrenheitOrCelsius {
-    var stringValue: String {
-        return "\(self)"
-    }
-    
-    var emoji: String {
-        switch self {
-        case .Celsius:
-            return "℃"
-        case .Fahrenheit:
-            return "℉"
-        }
-    }
-    
-    var pameter: String {
-        switch self {
-        case .Celsius:
-            return "metric"
-        default:
-            return "imperial"
-        }
-    }
-}
-
 class MainVC: UIViewController {
     
     lazy var locationManager: CLLocationManager = {
     
         let locationManager = CLLocationManager()
-        locationManager.delegate = self
+        locationManager.delegate = self // CLLocationManagerDelegate
         locationManager.requestWhenInUseAuthorization()// 포그라운드에서 권한 요청
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
                 
@@ -55,55 +26,8 @@ class MainVC: UIViewController {
     }()
     
     private(set) var items: [LocationVO] = {
-        []
+        return []
     }()
-    {
-        willSet {
-            print("willset")
-            if nil == items {
-                items = []
-                print("willset initialized..........")
-            }
-        }
-        didSet {
-            print("didSet 호출")
-            //tableView.reloadData()
-            
-            //UIView.transition(with: self.tableView, duration: 1.0, options: .transitionCrossDissolve, animations: {self.tableView.reloadData()}, completion: nil)
-        }
-    }
-//    private(set) var items: [LocationVO]? {
-//        willSet {
-//            print("willset")
-//            if nil == items {
-//                items = []
-//                print("willset initialized..........")
-//            }
-//        }
-//        didSet {
-//            print("didSet 호출")
-//            //tableView.reloadData()
-//
-//            //UIView.transition(with: self.tableView, duration: 1.0, options: .transitionCrossDissolve, animations: {self.tableView.reloadData()}, completion: nil)
-//        }
-//    }
-    
-    /*
-    private(set) var items: [LocationVO] = {
-        return [LocationVO]()
-        
-    }() {
-        didSet {
-//            
-//                didSet {
-//                    print("didSet 호출")
-//                    //tableView.reloadData()
-//                    
-//                    //UIView.transition(with: self.tableView, duration: 1.0, options: .transitionCrossDissolve, animations: {self.tableView.reloadData()}, completion: nil)
-//                }
-        }
-    }
- */
     
     var currentLocation: CLLocation?
     
@@ -112,14 +36,14 @@ class MainVC: UIViewController {
         let tbv = UITableView()
         
         view.addSubview(tbv)
+        
         tbv.translatesAutoresizingMaskIntoConstraints = false
         tbv.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         tbv.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tbv.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         tbv.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        //tbv.backgroundColor = .red
         
-        tbv.register(UINib(nibName: "WeatherCell", bundle: nil), forCellReuseIdentifier: "WeatherCell")
+        tbv.register(UINib(nibName: WeatherCell.reusableIdentifier, bundle: nil), forCellReuseIdentifier: WeatherCell.reusableIdentifier)
         tbv.separatorStyle = .none
                 
         tbv.delegate = self
@@ -130,20 +54,26 @@ class MainVC: UIViewController {
             if let view = loadedNib[1] as? UIView {
                 tbv.tableFooterView = view
                 
-                NotificationCenter.default.addObserver(self,
-                                                       selector: #selector(addLocation),
-                                                       name: Notification.Name("ADD_LOCATION"),
-                                                       object: nil)
+                NotificationCenter
+                    .default
+                    .addObserver(
+                        self,
+                        selector: #selector(addLocation),
+                        name: Notification.Name("ADD_LOCATION"),
+                        object: nil)
                 
-                NotificationCenter.default.addObserver(self,
-                                                       selector: #selector(changeNotation),
-                                                       name: Notification.Name("CHANGE_NOTATION"),
-                                                       object: nil)
+                NotificationCenter
+                    .default
+                    .addObserver(
+                        self,
+                        selector: #selector(changeNotation),
+                        name: Notification.Name("CHANGE_NOTATION"),
+                        object: nil)
             }
         }
         
         // xib 호출 방법2
-        //if let aa = UINib(nibName: "LocationFooter", bundle: nil).instantiate(withOwner: self, options: nil).first as? UIView //xib의 1번째
+        //if let aa = UINib(nibName: "LocationFooter", bundle: nil).instantiate(withOwner: self, options: nil).first as? UIView //xib의 첫번째
         /*if let aa = UINib(nibName: "LocationFooter", bundle: nil).instantiate(withOwner: self, options: nil)[1] as? UIView { // xib의 두번째
             tbv.tableFooterView = aa
             
@@ -152,26 +82,24 @@ class MainVC: UIViewController {
         return tbv
     }()
     
-    var count: Int = 0
-    
-    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
 
-    
-    private var dateFormatter: DateFormatter = {
+    private let dateFormatter: DateFormatter = {
        
         let df = DateFormatter()
         df.calendar = Calendar(identifier: .iso8601)
         df.timeZone = TimeZone.current
         //df.locale = Locale.current
+        //df.locale = Locale(identifier: "ko_KR")
         df.locale = Locale(identifier: UICommon.getLanguageCountryCode())
 
-        //df.locale = Locale(identifier: "ko_KR")
         df.dateFormat = "hh:mm a"
         return df
     }()
+    
+    // MARK: View Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -181,52 +109,46 @@ class MainVC: UIViewController {
         
         view.backgroundColor = .systemBackground
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            Indicator.INSTANCE.stopAnimating()
-
-            guard let self = self else {
-                return
-            }
-        }
-        
         // 아이폰 설정에서의 위치 서비스가 켜진 상태라면
         if CLLocationManager.locationServicesEnabled() {
             print("위치 서비스 On 상태")
             locationManager.startUpdatingLocation() //위치 정보 받아오기 시작 CLLocationManagerDelegate
-            //print(locationManager.location?.coordinate)
         } else {
             print("위치 서비스 Off 상태")
+            removeCurrentData()
         }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        _ = fetch()
+        let result = CoreDataHelper.fetch()
+        
+        self.tableView.performBatchUpdates({
+            _ = result.map {
+                items.append(
+                    LocationVO(
+                        currentArea: $0.value(forKey: "currentArea") as! Bool,
+                        city: $0.value(forKey: "city") as! String,
+                        code: $0.value(forKey: "code") as! String,
+                        longitude: $0.value(forKey: "longitude") as! String,
+                        latitude: $0.value(forKey: "latitude") as! String,
+                        recent_temp: $0.value(forKey: "recent_temp") as? Int,
+                        timezone: $0.value(forKey: "timezone") as! Int64
+                    )
+                )
+                
+                self.tableView.insertRows(at: [IndexPath(row: self.items.count - 1, section: 0)], with: .bottom)
+            }
+        
+        }, completion: nil)
+        
         checkLocations()
     }
     
+    // MARK: Selectors
     
-    func checkLocations() {
-        
-        // 설정된 도시 없으면 물어보기
-        if self.items.isEmpty, !_UDS.bool(forKey: "ADD_LOCATION") {
-            let alert = UIAlertController(title: "지역 선택", message: "날씨 정보를 받아볼 지역을 검색하세요.", preferredStyle: .alert)
-            let confirmAction = UIAlertAction(title: "확인", style: .default) { _ in
-                self.addLocation()
-                _UDS.setValue(true, forKey: "ADD_LOCATION") // 한번만 물어보기
-            }
-            let cancelAction = UIAlertAction(title: "취소", style: .cancel) { _ in
-                _UDS.setValue(true, forKey: "ADD_LOCATION") // 한번만 물어보기
-            }
-            alert.addAction(confirmAction)
-            alert.addAction(cancelAction)
-            
-            self.present(alert, animated: true)
-        }
-        
-    }
-    
+    /// 섭씨/화씨 전환
     @objc func changeNotation() {
         
         fahrenheitOrCelsius = (fahrenheitOrCelsius == FahrenheitOrCelsius.Celsius) ? .Fahrenheit : .Celsius
@@ -248,301 +170,59 @@ class MainVC: UIViewController {
         
         // 전체 리스트 바꾸기
         //tableView.reloadData()
-        
         UIView.transition(with: self.tableView, duration: 1.0, options: .transitionCrossDissolve, animations: {self.tableView.reloadData()}, completion: nil)
-        
-        // 헤더
-        //setHeaderView()
-        
     }
     
+    /// 도시 추가
     @objc func addLocation() {
         
         // 도시 검색
         let vc = AddLocationVC()
         
         vc.saveDelegate = self // SaveLocationDelegate
-        
+        /*
         vc.saveLocationAlias = { location in //[weak self] locationElements in
-            self.save(object: nil, location: location)
+            CoreDataHelper.save(object: nil, location: location)
             
             self.tableView.performBatchUpdates({
                 self.items.append(location)
                 self.tableView.insertRows(at: [IndexPath(row: self.items.count - 1, section: 0)], with: .bottom)
             }, completion: nil)
-        }
+        }*/
         self.present(vc, animated: true)
     }
     
-    func fetchByCurrent() -> NSManagedObject? {
-        
-        let context = _AD.persistentContainer.viewContext
-        
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "CD_Location")
-        
-        fetchRequest.predicate = NSPredicate(format: "currentArea == %i", 1)
-        
-        print("fetchRequest.predicate: \(fetchRequest.predicate!)")
-        
-        let currentArea = try? context.fetch(fetchRequest)
-        
-        print("currentArea: \(currentArea)")
-        print("currentArea.first: \(currentArea?.first)")
-        
-        return try? context.fetch(fetchRequest).first ?? nil
-    }
+    // MARK: User Functions
     
-    
-    func fetchByKey(code: String) -> NSManagedObject? {
+    /// 도시 추가 확인
+    func checkLocations() {
         
-        let context = _AD.persistentContainer.viewContext
-        
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "CD_Location")
-        
-        fetchRequest.predicate = NSPredicate(format: "code == %@", code)
-        
-        return try? context.fetch(fetchRequest).first ?? nil
-    }
-    
-    /// CoreData Fetch
-    /// - Returns: [Location]
-    func fetch() -> [NSManagedObject] {
-        let context = _AD.persistentContainer.viewContext
-        
-        //test
-        print("current => ")
-        try? _ = context.fetch(NSFetchRequest<NSManagedObject>(entityName: "CD_Current")).map {
-            print($0.value(forKey: "code"))
-            print($0.value(forKey: "temp"))
-            print($0.value(forKey: "weatherDescription"))
-        }
-        print("hourly =>")
-        try? _ = context.fetch(NSFetchRequest<NSManagedObject>(entityName: "CD_Hourly")).map {
-            print($0.value(forKey: "code"))
-            print($0.value(forKey: "dt"))
-            print($0.value(forKey: "icon"))
-            print($0.value(forKey: "temp"))
-        }
-        print("daily =>")
-        try? _ = context.fetch(NSFetchRequest<NSManagedObject>(entityName: "CD_Daily")).map {
-            print($0.value(forKey: "code"))
-            print($0.value(forKey: "dt"))
-            print($0.value(forKey: "humidity"))
-            print($0.value(forKey: "icon"))
-            print($0.value(forKey: "max"))
-            print($0.value(forKey: "min"))
-        }
-        
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "CD_Location")
-        
-        // 정렬 속성
-        do {
-            
-            
-            let sortCurrentArea = NSSortDescriptor(key: "currentArea", ascending: false)
-            let sortRegDate = NSSortDescriptor(key: "regdate", ascending: false)
-            fetchRequest.sortDescriptors = [sortCurrentArea, sortRegDate]
-            
-    
-            
-            let result = try context.fetch(fetchRequest)
-            
-            print("fetched result: \(result)")
-            
-            defer {
-                self.tableView.performBatchUpdates({
-                    _ = result.map {
-                        items.append(
-                            LocationVO(
-                                currentArea: $0.value(forKey: "currentArea") as! Bool,
-                                city: $0.value(forKey: "city") as! String,
-                                code: $0.value(forKey: "code") as! String,
-                                longitude: $0.value(forKey: "longitude") as! String,
-                                latitude: $0.value(forKey: "latitude") as! String,
-                                recent_temp: $0.value(forKey: "recent_temp") as? Int,
-                                timezone: $0.value(forKey: "timezone") as! Int64
-                            )
-                        )
-                        
-                        self.tableView.insertRows(at: [IndexPath(row: self.items.count - 1, section: 0)], with: .bottom)
-                    }
-                
-                }, completion: nil)
-            
+        // 설정된 도시 없으면 물어보기
+        if self.items.isEmpty, !_UDS.bool(forKey: "ADD_LOCATION") {
+            let alert = UIAlertController(title: "지역 선택", message: "날씨 정보를 받아볼 지역을 검색하세요.", preferredStyle: .alert)
+            let confirmAction = UIAlertAction(title: "확인", style: .default) { _ in
+                self.addLocation()
+                _UDS.setValue(true, forKey: "ADD_LOCATION") // 한번만 물어보기
             }
-            
-            return result
-        } catch let error {
-            print(error.localizedDescription)
-            return []
-        }
-    }
-    
-    func deleteByCode(code: String) -> Bool {
-    
-        if let result = fetchByKey(code: code) {
-            return delete(object: result)
-        } else {
-            return false
-        }
-    }
-    
-    @discardableResult
-    func delete(object: NSManagedObject) -> Bool {
-        
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
-        let context = appDelegate.persistentContainer.viewContext
-        
-        context.delete(object)
-        
-        do {
-            try context.save()
-            return true
-        } catch {
-            context.rollback()
-            return false
-        }
-    }
-    
-    @discardableResult
-    func editByCode(cityCode: String, temperature: Int?) -> Bool {
-        
-        print("cityCode: \(cityCode)")
-        
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
-        let context = appDelegate.persistentContainer.viewContext
-        
-        if let object = fetchByKey(code: cityCode) {
-            
-            if let temperature = temperature {
-                object.setValue(temperature, forKey: "recent_temp")
+            let cancelAction = UIAlertAction(title: "취소", style: .cancel) { _ in
+                _UDS.setValue(true, forKey: "ADD_LOCATION") // 한번만 물어보기
             }
+            alert.addAction(confirmAction)
+            alert.addAction(cancelAction)
             
-            object.setValue(Date(), forKey: "regdate")
-            
-            do {
-                try context.save()
-                return true
-            } catch {
-                context.rollback()
-                return false
-            }
-        }
-        
-        return false
-    }
-    
-    @available(*, deprecated)
-    @discardableResult
-    func edit(object: NSManagedObject, location: LocationVO) -> Bool {
-        
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
-        let context = appDelegate.persistentContainer.viewContext
-        
-        print("111: de222저장: \(location.city) \(location.currentArea)")
-        
-        object.setValue(location.city, forKey: "city")
-        object.setValue(location.code, forKey: "code")
-        object.setValue(location.recent_temp, forKey: "recent_temp")
-        object.setValue(location.currentArea, forKey: "currentArea")
-        object.setValue(location.latitude, forKey: "latitude")
-        object.setValue(location.longitude, forKey: "longitude")
-        object.setValue(location.timezone, forKey: "timezone")
-        
-        object.setValue(Date(), forKey: "regdate")
-        
-        do {
-            try context.save()
-            return true
-        } catch {
-            context.rollback()
-            return false
+            self.present(alert, animated: true)
         }
     }
     
-    @available(*, deprecated)
-    @discardableResult
-    func save(location: LocationVO) -> Bool {
-                
-        let context = _AD.persistentContainer.viewContext
-        
-        let object = NSEntityDescription.insertNewObject(forEntityName: "CD_Location", into: context)
-        
-        print("111: de1저장: \(location.city) \(location.currentArea)")
-        object.setValue(location.currentArea, forKey: "currentArea")
-        object.setValue(location.city, forKey: "city")
-        object.setValue(location.code, forKey: "code")
-        object.setValue(location.longitude, forKey: "longitude")
-        object.setValue(location.latitude, forKey: "latitude")
-        object.setValue(location.recent_temp, forKey: "recent_temp")
-        object.setValue(Date(), forKey: "regdate")
-        object.setValue(location.timezone, forKey: "timezone")
-        
-        do {
-            try context.save()
-            return true
-        } catch {
-            context.rollback()
-            return false
+    /// 현위치 저장 내역 삭제
+    func removeCurrentData() {
+        // 기존에 현위치 저장된 것이 있다면 삭제
+        if let currentArea = CoreDataHelper.fetchByCurrent() {
+            CoreDataHelper.delete(object: currentArea)
         }
     }
     
-    @discardableResult
-    func save(object: NSManagedObject?, location: LocationVO) -> Bool {
-                
-        let context = _AD.persistentContainer.viewContext
-        
-        var obj: NSManagedObject!
-        
-        if nil != object {
-            obj = object
-        } else {
-            obj = NSEntityDescription.insertNewObject(forEntityName: "CD_Location", into: context)
-        }
-        
-        print("111: 저장: \(location.city) \(location.currentArea)")
-        obj.setValue(location.currentArea, forKey: "currentArea")
-        obj.setValue(location.city, forKey: "city")
-        obj.setValue(location.code, forKey: "code")
-        obj.setValue(location.longitude, forKey: "longitude")
-        obj.setValue(location.latitude, forKey: "latitude")
-        obj.setValue(location.recent_temp, forKey: "recent_temp")
-        obj.setValue(Date(), forKey: "regdate")
-        obj.setValue(location.timezone, forKey: "timezone")
-        
-        do {
-            try context.save()
-            return true
-        } catch {
-            context.rollback()
-            return false
-        }
-    }
-//
-//    func convertToAddressWith(coordinate: CLLocation) {
-//        let geoCoder = CLGeocoder()
-//        geoCoder.reverseGeocodeLocation(coordinate) { (placemarks, error) -> Void in
-//            if error != nil {
-//                NSLog("\(error)")
-//                return
-//            }
-//
-//            guard let placemark = placemarks?.first else { return }
-//
-//            print("placemark: \(placemark)")
-//
-//            self.currentLocation = placemark
-//
-//            let headerView = UINib(nibName: "WeatherCell", bundle: nil).instantiate(withOwner: self, options: [:]).first as! WeatherCell
-//            self.tableView.tableHeaderView = headerView
-//
-//            self.setHeaderView()
-//
-//        }
-//    }
+    // MARK: Deprecated
     
     @available(*, deprecated)
     func setHeaderView() {
@@ -555,14 +235,19 @@ class MainVC: UIViewController {
         headerView.temperature.text = "--\(fahrenheitOrCelsius.emoji)"
         
         let param: [String: Any] = ["lat": location.coordinate.latitude,
-                                    "lon": location.coordinate.longitude,
-                                    "appid": "0367480f207592a2a18d028adaac65d2",
-                                    "lang": _COUNTRY,
-                                    "units": fahrenheitOrCelsius.pameter] //imperial - Fahrenheit
+                                    "lon": location.coordinate.longitude]
         API(session: Session.default)
-            .request("https://api.openweathermap.org/data/2.5/weather", method: .get, parameters: param, encoding: URLEncoding.default, headers: nil, interceptor: nil, requestModifier: nil) { json in
+            .request(
+                API.WEATHER,
+                method: .get,
+                parameters: param,
+                encoding: URLEncoding.default,
+                headers: nil,
+                interceptor: nil,
+                requestModifier: nil
+            ) { json in
                 
-                print(JSON(json))
+                //print(JSON(json))
                 
                 headerView.locationName.text = "현재위치 - \(json["name"].stringValue)"
                 headerView.temperature.text = "\(json["main"]["temp"].intValue)\(fahrenheitOrCelsius.emoji)"
@@ -577,15 +262,6 @@ extension MainVC: UITableViewDataSource {
         return items.count
     }
     
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        cell.alpha = 0
-        cell.layer.transform = CATransform3DMakeScale(0.8, 0.8, 0.8)
-        UIView.animate(withDuration: 0.5, delay: 0.2 * Double(indexPath.row)) {
-            cell.alpha = 1
-            cell.layer.transform = CATransform3DScale(CATransform3DIdentity, 1, 1, 1)
-        }
-    }
-    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "WeatherCell") as? WeatherCell
@@ -593,13 +269,12 @@ extension MainVC: UITableViewDataSource {
         
         cell.separatorInset = UIEdgeInsets.zero // https://zeddios.tistory.com/235
                 
-        var record = self.items[indexPath.row]
+        let record = self.items[indexPath.row]
         
         print("111: \(record.city) \(record.currentArea)")
         
         cell.locationName.text = record.city
         
-        print("record.recent_temp : \(record.recent_temp)")
         if let temp = record.recent_temp {
             cell.temperature.text = "\(temp)\(fahrenheitOrCelsius.emoji)"
         } else {
@@ -616,12 +291,18 @@ extension MainVC: UITableViewDataSource {
         cell.time.text = df.string(from: Date())
         
         let param: [String: Any] = ["lat": record.latitude,
-                                    "lon": record.longitude,
-                                    "appid": "0367480f207592a2a18d028adaac65d2",
-                                    "lang": _COUNTRY,
-                                    "units": fahrenheitOrCelsius.pameter]
+                                    "lon": record.longitude]
+        
         API.init(session: Session.default)
-            .request("https://api.openweathermap.org/data/2.5/weather", method: .get, parameters: param, encoding: URLEncoding.default, headers: nil, interceptor: nil, requestModifier: nil) { json in
+            .request(
+                API.WEATHER,
+                method: .get,
+                parameters: param,
+                encoding: URLEncoding.default,
+                headers: nil,
+                interceptor: nil,
+                requestModifier: nil
+            ) { json in
                 
                 //print(JSON(json))
                 
@@ -629,7 +310,7 @@ extension MainVC: UITableViewDataSource {
                 cell.temperature.fadeTransition(0.8)
                 cell.temperature.text = "\(temp)\(fahrenheitOrCelsius.emoji)"
                 
-                self.editByCode(cityCode: json["id"].stringValue, temperature: temp)
+                CoreDataHelper.editByCode(cityCode: json["id"].stringValue, temperature: temp)
                 
                 
 //                print(Date())
@@ -647,18 +328,74 @@ extension MainVC: UITableViewDataSource {
 //                print(Date(timeIntervalSince1970: TimeInterval(1619578800)).addingTimeInterval(32400)) // daily-final
 //                print(Date(timeIntervalSince1970: TimeInterval(1619089200)).addingTimeInterval(32400)) // rome
                 
+                /*
+                 
+                 let object = items[indexPath.row]
+                 
+                 let location = CLLocation(
+                     latitude: CLLocationDegrees(Double(object.latitude)!),
+                     longitude: CLLocationDegrees(Double(object.longitude)!)
+                 )
+             
+                 let vc = DetailWeatherVC(locationName: object.city, locationCode: object.code, location: location)
+             
+                 
+                 */
+                /*    print("callDetailData needed")
+                let param: [String: Any] = ["lat": record.latitude,
+                                            "lon": record.longitude,
+                                                "appid": "0367480f207592a2a18d028adaac65d2",
+                                                "lang": _COUNTRY,
+                                                "units": fahrenheitOrCelsius.pameter] //imperial - Fahrenheit
+                    API(session: Session.default)
+                        .request("https://api.openweathermap.org/data/2.5/onecall", method: .get, parameters: param, encoding: URLEncoding.default, headers: nil, interceptor: nil, requestModifier: nil) { json in
+                            
+                            //print(JSON(json))
+                            
+                            // Tx 발생하기때문에 강한 참조로 묶어준다. https://jinsangjin.tistory.com/129 참고
+                            //guard let self = self else { return }
+                            
+                            do {
+                                let data = try JSONDecoder().decode(DetailData.self, from: json.rawData())
+                                
+                                let context = _AD.persistentContainer.viewContext
+                                
+                                let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "CD_Location")
+                                
+                                fetchRequest.predicate = NSPredicate(format: "code == %@", record.code)
+                                
+                                guard let location = try context.fetch(fetchRequest).first else {
+                                    fatalError()
+                                }
+                                
+                                location.setValue(data, forKey: "current")
+                                
+                                try context.save()
+                                print("context (\(indexPath.row)) saved")
+                            } catch let error {
+                                print(error)
+                                print(error.localizedDescription)
+                                fatalError()
+                            }
+                        }*/
             }
         //cell.backgroundColor = .random
  
         return cell
     }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 100
-    }
 }
 
 extension MainVC: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        cell.alpha = 0
+        cell.layer.transform = CATransform3DMakeScale(0.8, 0.8, 0.8)
+        UIView.animate(withDuration: 0.5, delay: 0.2 * Double(indexPath.row)) {
+            cell.alpha = 1
+            cell.layer.transform = CATransform3DScale(CATransform3DIdentity, 1, 1, 1)
+        }
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let object = items[indexPath.row]
@@ -690,7 +427,7 @@ extension MainVC: UITableViewDelegate {
         
         let object = items[indexPath.row]
         
-        if self.deleteByCode(code: object.code) {
+        if CoreDataHelper.deleteByCode(code: object.code) {
             
             tableView.performBatchUpdates({
                 items.remove(at: indexPath.row)
@@ -700,14 +437,8 @@ extension MainVC: UITableViewDelegate {
         }
     }
     
-    func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        
-        let object = items[indexPath.row]
-//
-//        let uvc = self.storyboard?.instantiateViewController(identifier: "LogVC") as! LogVC
-//        uvc.board = (object as! BoardMO)
-//
-//        self.show(uvc, sender: self)
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 100
     }
 }
 
@@ -719,25 +450,27 @@ extension MainVC: CLLocationManagerDelegate {
             print(locationManager)
             guard let currentLocation = locationManager.location else { return }
             
-            let prevLocation = self.fetchByCurrent()
+            let prevLocation = CoreDataHelper.fetchByCurrent()
             
-            if nil != prevLocation {
-                if ((prevLocation?.value(forKey: "longitude") as! String).nearBy() == currentLocation.coordinate.longitude.description.nearBy()) &&
-                    ((prevLocation?.value(forKey: "latitude") as! String).nearBy() == currentLocation.coordinate.latitude.description.nearBy()) {
+            if let loc = prevLocation {
+                if ((loc.value(forKey: "longitude") as! String).nearBy() == currentLocation.coordinate.longitude.description.nearBy()) &&
+                    ((loc.value(forKey: "latitude") as! String).nearBy() == currentLocation.coordinate.latitude.description.nearBy()) {
                     // do nothing
                     
                     print("위치 같아서 안해도 됨")
                     return
+                } else {
+                    // 지난 현재위치 삭제
+                    CoreDataHelper.delete(object: loc)
                 }
             }
             
-            let param: [String: Any] = ["lat": currentLocation.coordinate.latitude,
-                                        "lon": currentLocation.coordinate.longitude,
-                                        "appid": "0367480f207592a2a18d028adaac65d2",
-                                        "lang": _COUNTRY,
-                                        "units": fahrenheitOrCelsius.pameter] //imperial - Fahrenheit
+            let param: [String: Any] =
+                ["lat": currentLocation.coordinate.latitude,
+                 "lon": currentLocation.coordinate.longitude]
+    
             API(session: Session.default)
-                .request("https://api.openweathermap.org/data/2.5/weather",
+                .request(API.WEATHER,
                          method: .get,
                          parameters: param,
                          encoding: URLEncoding.default,
@@ -758,7 +491,7 @@ extension MainVC: CLLocationManagerDelegate {
                         )
                         
                         // 기존에 현위치 저장된 것이 있다면 업데이트 없으면 인서트
-                        self.save(
+                        CoreDataHelper.save(
                             object: prevLocation,
                             location: locationVO
                         )
@@ -768,40 +501,19 @@ extension MainVC: CLLocationManagerDelegate {
                     }, completion: nil)
                 }
         } else {
-            
-            // 기존에 현위치 저장된 것이 있다면 삭제
-            if let currentArea = self.fetchByCurrent() {
-                self.delete(object: currentArea)
-            }
+            removeCurrentData()
         }
-    }
-}
-
-extension String {
-    func nearBy() -> String {
-        return String(Int((Double(self) ?? 0) * 1000))
     }
 }
 
 extension MainVC: SaveLocationDelegate {
     func requestSave(vo: LocationVO) {
         
-        self.save(object: nil, location: vo)
+        CoreDataHelper.save(object: nil, location: vo)
         
         self.tableView.performBatchUpdates({
             self.items.append(vo)
             self.tableView.insertRows(at: [IndexPath(row: self.items.count - 1, section: 0)], with: .bottom)
         }, completion: nil)
-    }
-}
-
-extension UIView {
-    func fadeTransition(_ duration:CFTimeInterval) {
-        let animation = CATransition()
-        animation.timingFunction = CAMediaTimingFunction(name:
-            CAMediaTimingFunctionName.easeInEaseOut)
-        animation.type = CATransitionType.fade
-        animation.duration = duration
-        layer.add(animation, forKey: CATransitionType.fade.rawValue)
     }
 }

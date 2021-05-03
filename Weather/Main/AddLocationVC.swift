@@ -156,13 +156,10 @@ extension AddLocationVC: UITableViewDelegate {
             print("placeMark : \(placeMark)")
             
             let param: [String: Any] = ["lat": placeMark.coordinate.latitude.description,
-                                        "lon": placeMark.coordinate.longitude.description,
-                                        "appid": "0367480f207592a2a18d028adaac65d2",
-                                        "lang": _COUNTRY,
-                                        "units": fahrenheitOrCelsius.pameter] //imperial - Fahrenheit
+                                        "lon": placeMark.coordinate.longitude.description]
             
             API.init(session: Session.default)
-                .request("https://api.openweathermap.org/data/2.5/weather",
+                .request(API.WEATHER,
                          method: .get,
                          parameters: param,
                          encoding: URLEncoding.default,

@@ -10,9 +10,12 @@ import UIKit
 import Alamofire
 import SwiftyJSON
 
-class API {
+struct API {
     
     private let sessionManager: SessionManagerProtocol
+    private let appid = "0367480f207592a2a18d028adaac65d2"
+    static let WEATHER = "https://api.openweathermap.org/data/2.5/weather"
+    static let ONCELL = "https://api.openweathermap.org/data/2.5/onecall"
 
     init(session: SessionManagerProtocol) {
         sessionManager = session
@@ -26,10 +29,8 @@ class API {
     ///   - completionHandler: 콜백
     func request(_ convertible: Alamofire.URLConvertible, method: Alamofire.HTTPMethod, parameters: Alamofire.Parameters?, encoding: Alamofire.ParameterEncoding, headers: Alamofire.HTTPHeaders?, interceptor: Alamofire.RequestInterceptor?, requestModifier: Alamofire.Session.RequestModifier?, completionHandler: @escaping (JSON) -> Void) {
         _SI.startAnimating()
-
-        print("path: \(convertible)\nparam: \(parameters)")
-
-        sessionManager.request(convertible, method: method, parameters: parameters, encoding: encoding, headers: headers, interceptor: interceptor, requestModifier: requestModifier)
+        
+        sessionManager.request(convertible, method: method, parameters: setAdditionalInfo(params: parameters), encoding: encoding, headers: headers, interceptor: interceptor, requestModifier: requestModifier)
             .responseJSON(completionHandler: { response in
 
                 _SI.stopAnimating()
@@ -67,5 +68,18 @@ class API {
                     }
                 }
             })
+    }
+    
+    /// 공통 파라메터 추가분 적용
+    /// - Parameter params: 기존 파라메터
+    /// - Returns: 추가 파라메터 적용 파라메터
+    func setAdditionalInfo(params: Alamofire.Parameters?) -> Alamofire.Parameters? {
+        
+        var parameters = params
+        parameters?.updateValue(appid, forKey: "appid")
+        parameters?.updateValue(_COUNTRY, forKey: "lang")
+        parameters?.updateValue(fahrenheitOrCelsius.pameter, forKey: "units")
+        
+        return parameters
     }
 }

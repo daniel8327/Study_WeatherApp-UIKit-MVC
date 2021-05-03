@@ -7,14 +7,14 @@
 
 import Foundation
 
-protocol JSONVO {
+protocol WeatherList {
     
 }
 
-struct HourlyVO: JSONVO {
+struct HourlyVO: WeatherList {
     var items: [Current]
 }
 
-struct DailyVO: JSONVO {
+struct DailyVO: WeatherList {
     var items: [Daily]
 }

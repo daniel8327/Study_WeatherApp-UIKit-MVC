@@ -1,32 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="19H1030" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="CD_Current" representedClassName="CD_Current" syncable="YES" codeGenerationType="class">
-        <attribute name="code" optional="YES" attributeType="String"/>
-        <attribute name="temp" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="weatherDescription" optional="YES" attributeType="String"/>
-        <relationship name="daily" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CD_Daily"/>
-        <relationship name="hourly" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CD_Hourly"/>
-        <relationship name="location" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CD_Location" inverseName="weather" inverseEntity="CD_Location"/>
-    </entity>
-    <entity name="CD_Daily" representedClassName="CD_Daily" syncable="YES" codeGenerationType="class">
-        <attribute name="code" optional="YES" attributeType="String"/>
-        <attribute name="dt" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="humidity" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="icon" optional="YES" attributeType="String"/>
-        <attribute name="max" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="min" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="current" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CD_Current"/>
-    </entity>
-    <entity name="CD_Hourly" representedClassName="CD_Hourly" syncable="YES" codeGenerationType="class">
-        <attribute name="code" optional="YES" attributeType="String"/>
-        <attribute name="dt" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="icon" optional="YES" attributeType="String"/>
-        <attribute name="temp" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="current" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CD_Current"/>
-    </entity>
     <entity name="CD_Location" representedClassName="CD_Location" syncable="YES" codeGenerationType="class">
         <attribute name="city" optional="YES" attributeType="String"/>
         <attribute name="code" optional="YES" attributeType="String"/>
+        <attribute name="current" optional="YES" attributeType="Transformable" valueTransformerName=""/>
         <attribute name="currentArea" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="etc" optional="YES" attributeType="String"/>
         <attribute name="latitude" optional="YES" attributeType="String"/>
@@ -34,12 +11,8 @@
         <attribute name="recent_temp" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="regdate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="timezone" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="weather" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="CD_Current" inverseName="location" inverseEntity="CD_Current"/>
     </entity>
     <elements>
-        <element name="CD_Current" positionX="-67.47265625" positionY="-8.1484375" width="128" height="133"/>
         <element name="CD_Location" positionX="-244.90625" positionY="-239.8203125" width="128" height="193"/>
-        <element name="CD_Daily" positionX="162.99609375" positionY="-200.2109375" width="128" height="148"/>
-        <element name="CD_Hourly" positionX="158.6328125" positionY="200.3359375" width="128" height="118"/>
     </elements>
 </model>
