@@ -20,18 +20,11 @@ class WeatherCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         
-        self.contentView.isSkeletonable = true
+        self.isSkeletonable = true
         
         containerView.isSkeletonable = true
         time.isSkeletonable = true
         locationName.isSkeletonable = true
-        temperature.isSkeletonable = true
-        
-        
-        containerView.skeletonCornerRadius = 8
-        time.skeletonCornerRadius = 8
-        locationName.skeletonCornerRadius = 8
-        temperature.skeletonCornerRadius = 8
-        
+        temperature.isSkeletonable = true        
     }
 }

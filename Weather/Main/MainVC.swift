@@ -10,6 +10,7 @@ import CoreLocation
 import UIKit
 
 import Alamofire
+import SkeletonView
 import SwiftyJSON
 
 
@@ -33,7 +34,7 @@ class MainVC: UIViewController {
     
     lazy var tableView: UITableView = {
         
-        let tbv = UITableView()
+         let tbv = UITableView(frame: .zero)
         
         view.addSubview(tbv)
         
@@ -43,11 +44,12 @@ class MainVC: UIViewController {
         tbv.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         tbv.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         
+        tbv.rowHeight = UITableView.automaticDimension
+        tbv.estimatedRowHeight = 100
+        
         tbv.register(UINib(nibName: WeatherCell.reusableIdentifier, bundle: nil), forCellReuseIdentifier: WeatherCell.reusableIdentifier)
         tbv.separatorStyle = .none
-                
-        tbv.delegate = self
-        tbv.dataSource = self
+        
         
         // xib 호출 방법1
         if let loadedNib = Bundle.main.loadNibNamed("LocationFooter", owner: self, options: nil) {
@@ -105,45 +107,66 @@ class MainVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        Indicator.INSTANCE.startAnimating()
+        
+        tableView.delegate = self
+        tableView.dataSource = self
+        
+        
+        tableView.isSkeletonable = true
+
+        let animation = SkeletonAnimationBuilder().makeSlidingAnimation(withDirection: .leftRight, duration: 0.5, autoreverses: true)
+
+        tableView.showAnimatedGradientSkeleton(usingGradient: .init(baseColor: .lightGray), animation: animation, transition: .crossDissolve(0.5))
+        tableView.showSkeleton(usingColor: .red)
+        
+        
         
         view.backgroundColor = .systemBackground
         
-        // 아이폰 설정에서의 위치 서비스가 켜진 상태라면
-        if CLLocationManager.locationServicesEnabled() {
-            print("위치 서비스 On 상태")
-            locationManager.startUpdatingLocation() //위치 정보 받아오기 시작 CLLocationManagerDelegate
-        } else {
-            print("위치 서비스 Off 상태")
-            removeCurrentData()
-        }
+//        // 아이폰 설정에서의 위치 서비스가 켜진 상태라면
+//        if CLLocationManager.locationServicesEnabled() {
+//            print("위치 서비스 On 상태")
+//            locationManager.startUpdatingLocation() //위치 정보 받아오기 시작 CLLocationManagerDelegate
+//        } else {
+//            print("위치 서비스 Off 상태")
+//            removeCurrentData()
+//        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        let result = CoreDataHelper.fetch()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            
+            let result = CoreDataHelper.fetch()
         
-        self.tableView.performBatchUpdates({
-            _ = result.map {
-                items.append(
-                    LocationVO(
-                        currentArea: $0.value(forKey: "currentArea") as! Bool,
-                        city: $0.value(forKey: "city") as! String,
-                        code: $0.value(forKey: "code") as! String,
-                        longitude: $0.value(forKey: "longitude") as! String,
-                        latitude: $0.value(forKey: "latitude") as! String,
-                        recent_temp: $0.value(forKey: "recent_temp") as? Int,
-                        timezone: $0.value(forKey: "timezone") as! Int64
+            
+            //self.tableView.performBatchUpdates({
+                _ = result.map {
+                    self.items.append(
+                        LocationVO(
+                            currentArea: $0.value(forKey: "currentArea") as! Bool,
+                            city: $0.value(forKey: "city") as! String,
+                            code: $0.value(forKey: "code") as! String,
+                            longitude: $0.value(forKey: "longitude") as! String,
+                            latitude: $0.value(forKey: "latitude") as! String,
+                            recent_temp: $0.value(forKey: "recent_temp") as? Int,
+                            timezone: $0.value(forKey: "timezone") as! Int64
+                        )
                     )
-                )
+                    
+                    //self.tableView.insertRows(at: [IndexPath(row: self.items.count - 1, section: 0)], with: .bottom)
+                }
+            
+                self.tableView.reloadData()
+            
+                self.tableView.stopSkeletonAnimation()
+                self.tableView.hideSkeleton(reloadDataAfter: true)
                 
-                self.tableView.insertRows(at: [IndexPath(row: self.items.count - 1, section: 0)], with: .bottom)
-            }
-        
-        }, completion: nil)
-        
-        checkLocations()
+            //}, completion: nil)
+            
+            self.checkLocations()
+        }
     }
     
     // MARK: Selectors
@@ -168,9 +191,9 @@ class MainVC: UIViewController {
 
         footer.notation.attributedText = attributeString
         
-        // 전체 리스트 바꾸기
-        //tableView.reloadData()
-        UIView.transition(with: self.tableView, duration: 1.0, options: .transitionCrossDissolve, animations: {self.tableView.reloadData()}, completion: nil)
+        self.tableView.reloadData()
+        //UIView.transition(with: self.tableView, duration: 1.0, options: .transitionCrossDissolve, animations: {self.tableView.reloadData()}, completion: nil)
+        
     }
     
     /// 도시 추가
@@ -256,7 +279,12 @@ class MainVC: UIViewController {
     }
 }
 
-extension MainVC: UITableViewDataSource {
+extension MainVC: SkeletonTableViewDataSource {
+    
+    func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
+        return "WeatherCell"
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         return items.count
@@ -307,7 +335,7 @@ extension MainVC: UITableViewDataSource {
                 //print(JSON(json))
                 
                 let temp = json["main"]["temp"].intValue
-                cell.temperature.fadeTransition(0.8)
+                //cell.temperature.fadeTransition(0.8)
                 cell.temperature.text = "\(temp)\(fahrenheitOrCelsius.emoji)"
                 
                 CoreDataHelper.editByCode(cityCode: json["id"].stringValue, temperature: temp)
@@ -385,15 +413,15 @@ extension MainVC: UITableViewDataSource {
     }
 }
 
-extension MainVC: UITableViewDelegate {
+extension MainVC: SkeletonTableViewDelegate {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        cell.alpha = 0
-        cell.layer.transform = CATransform3DMakeScale(0.8, 0.8, 0.8)
-        UIView.animate(withDuration: 0.5, delay: 0.2 * Double(indexPath.row)) {
-            cell.alpha = 1
-            cell.layer.transform = CATransform3DScale(CATransform3DIdentity, 1, 1, 1)
-        }
+//        cell.alpha = 0
+//        cell.layer.transform = CATransform3DMakeScale(0.8, 0.8, 0.8)
+//        UIView.animate(withDuration: 0.5, delay: 0.2 * Double(indexPath.row)) {
+//            cell.alpha = 1
+//            cell.layer.transform = CATransform3DScale(CATransform3DIdentity, 1, 1, 1)
+//        }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -407,7 +435,7 @@ extension MainVC: UITableViewDelegate {
     
         let vc = DetailWeatherVC(locationName: object.city, locationCode: object.code, location: location)
     
-        UICommon.setTransitionAnimation(navi: self.navigationController)
+        //UICommon.setTransitionAnimation(navi: self.navigationController)
         self.present(vc, animated: true)
     }
     
