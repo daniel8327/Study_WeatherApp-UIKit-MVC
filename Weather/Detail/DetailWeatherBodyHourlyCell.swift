@@ -20,7 +20,7 @@ class DetailWeatherBodyHourlyCell: UITableViewCell {
         df.timeZone = TimeZone.current
         df.locale = Locale.current
         df.locale = Locale(identifier: UICommon.getLanguageCountryCode())
-        df.dateFormat = "H a"
+        df.dateFormat = "a H"
         return df
     }()
     
