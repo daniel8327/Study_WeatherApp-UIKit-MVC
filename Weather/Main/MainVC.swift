@@ -219,6 +219,12 @@ class MainVC: UIViewController {
         // 기존에 현위치 저장된 것이 있다면 삭제
         if let currentArea = CoreDataHelper.fetchByCurrent() {
             CoreDataHelper.delete(object: currentArea)
+            
+            tableView.performBatchUpdates({
+                items.remove(at: 0)
+                tableView.deleteRows(at: [IndexPath(row: 0, section: 0)], with: .fade)
+                
+            }, completion: nil)
         }
     }
     
@@ -389,7 +395,7 @@ extension MainVC: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         cell.alpha = 0
-        cell.layer.transform = CATransform3DMakeScale(0.8, 0.8, 0.8)
+        cell.layer.transform = CATransform3DMakeScale(0.9, 0.9, 0.9)
         UIView.animate(withDuration: 0.5, delay: 0.2 * Double(indexPath.row)) {
             cell.alpha = 1
             cell.layer.transform = CATransform3DScale(CATransform3DIdentity, 1, 1, 1)
@@ -398,16 +404,18 @@ extension MainVC: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        let object = items[indexPath.row]
-        
+        /*let object = items[indexPath.row]
+
         let location = CLLocation(
             latitude: CLLocationDegrees(Double(object.latitude)!),
             longitude: CLLocationDegrees(Double(object.longitude)!)
         )
+        let vc = DetailWeatherVC(locationName: object.city, locationCode: object.code, location: location)*/
+        
+        // PageViewController 호출
+        let vc = DetailWeatherPageVC(items: self.items, index: indexPath.row)
     
-        let vc = DetailWeatherVC(locationName: object.city, locationCode: object.code, location: location)
-    
-        UICommon.setTransitionAnimation(navi: self.navigationController)
+        //UICommon.setTransitionAnimation(navi: self.navigationController)
         self.present(vc, animated: true)
     }
     

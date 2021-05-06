@@ -8,7 +8,6 @@
 import UIKit
 
 class DetailWeatherBodyDailyCell: UITableViewCell {
-    
     @IBOutlet weak var dt: UILabel!
     @IBOutlet weak var icon: UIImageView!
     @IBOutlet weak var rainExpectation: UILabel!

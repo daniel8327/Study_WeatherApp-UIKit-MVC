@@ -92,11 +92,7 @@ extension DetailWeatherBodyHourlyCell: UICollectionViewDataSource {
         
         let iconURL = "http://openweathermap.org/img/wn/\(data.weather[0].icon)@2x.png"
         
-        //print("icon: \(iconURL)")
         cell.icon.kf.setImage(with: URL(string: iconURL))
-        //cell.icon.kf.setImage(with: URL(string: iconURL))
-        
-        //cell.backgroundColor = .random
         
         return cell
     }

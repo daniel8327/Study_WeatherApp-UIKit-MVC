@@ -17,6 +17,7 @@ class DetailWeatherVC: UIViewController {
     var location: CLLocation
     var locationName: String
     var locationCode: String
+    var index: Int
     
     var detailData: DetailData?
     
@@ -47,17 +48,17 @@ class DetailWeatherVC: UIViewController {
         tbv.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         //tbv.backgroundColor = .random
         
+        // 헤더
         //tbv.register(UINib(nibName: "DetailWeatherHeaderCell", bundle: nil), forHeaderFooterViewReuseIdentifier: "DetailWeatherHeaderCell")
         tbv.register(UINib(nibName: DetailWeatherHeaderCell.reusableIdentifier, bundle: nil), forHeaderFooterViewReuseIdentifier: DetailWeatherHeaderCell.reusableIdentifier)
         
-        
-//        tbv.register(UINib(nibName: DetailWeatherBodyHourlyCell.reusableIdentifier, bundle: nil), forCellReuseIdentifier: DetailWeatherBodyHourlyCell.reusableIdentifier) // ui base
+        // 바디 1
+        //tbv.register(UINib(nibName: DetailWeatherBodyHourlyCell.reusableIdentifier, bundle: nil), forCellReuseIdentifier: DetailWeatherBodyHourlyCell.reusableIdentifier) // ui base
         tbv.register(DetailWeatherBodyHourlyCell2.self, forCellReuseIdentifier: DetailWeatherBodyHourlyCell2.reusableIdentifier) // code base
         
-        
+        // 바디 2
         tbv.register(UINib(nibName: DetailWeatherBodyDailyCell.reusableIdentifier, bundle: nil), forCellReuseIdentifier: DetailWeatherBodyDailyCell.reusableIdentifier) // code base
         
-        //tbv.separatorStyle = .none
         tbv.allowsSelection = false
         tbv.showsVerticalScrollIndicator = false
         
@@ -65,10 +66,16 @@ class DetailWeatherVC: UIViewController {
         
     }()
     
-    init(locationName: String, locationCode: String, location: CLLocation) {
+    /// 초기화
+    /// - Parameters:
+    ///   - locationName: 지역명
+    ///   - locationCode: 지역코드
+    ///   - location: CLLocation
+    init(locationName: String, locationCode: String, location: CLLocation, index: Int) {
         self.locationName = locationName
         self.locationCode = locationCode
         self.location = location
+        self.index = index
         
         if let location = CoreDataHelper.fetchByKey(code: locationCode), let current = location.value(forKey: "current") as? Data {
             
@@ -107,6 +114,8 @@ class DetailWeatherVC: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: View Life Cycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -120,13 +129,15 @@ class DetailWeatherVC: UIViewController {
         }
     }
     
+    // MARK: Selectors
+    
+    // MARK: User Functions
+    
+    /// 상세 날씨 정보 가져오기
     func callDetailData() {
         print("callDetailData needed")
         let param: [String: Any] = ["lat": location.coordinate.latitude,
-                                    "lon": location.coordinate.longitude,
-                                    "appid": "0367480f207592a2a18d028adaac65d2",
-                                    "lang": _COUNTRY,
-                                    "units": fahrenheitOrCelsius.pameter] //imperial - Fahrenheit
+                                    "lon": location.coordinate.longitude]
         API(session: Session.default)
             .request(
                 API.ONCELL,
@@ -163,6 +174,9 @@ class DetailWeatherVC: UIViewController {
             }
     }
     
+    /// 상세 날씨 정보 CoreData 저장
+    /// - Parameter data: Data
+    /// - Throws: Error
     func saveDetails(_ data: Data) throws {
         
         guard let location = CoreDataHelper.fetchByKey(code: locationCode) else {
@@ -175,6 +189,8 @@ class DetailWeatherVC: UIViewController {
         try context.save()
     }
     
+    /// items 셋팅
+    /// - Parameter detailData: DetailData
     func setItems(detailData: DetailData) {
         
         items = [WeatherList]()
@@ -184,6 +200,7 @@ class DetailWeatherVC: UIViewController {
         setHeader()
     }
     
+    /// 헤더 설정
     func setHeader() {
         
         guard let header = UINib(nibName: DetailWeatherHeaderCell.reusableIdentifier, bundle: nil)
@@ -254,10 +271,8 @@ extension DetailWeatherVC: UITableViewDataSource {
             
             let iconURL = "http://openweathermap.org/img/wn/\(data.weather[0].icon)@2x.png"
             
-            //print("icon: \(iconURL)")
             cell.icon.kf.setImage(with: URL(string: iconURL))
-            //cell.weatherId.text = "\(data.weather[0].id)"
-            cell.rainExpectation.text = data.humidity > 30 ? "\(data.humidity)" : ""
+            cell.rainExpectation.text = data.humidity > 30 ? "\(data.humidity)" : "" // 습도
             cell.max.text = "\(Int(data.temp.max))"
             cell.min.text = "\(Int(data.temp.min))"
             
@@ -271,8 +286,8 @@ extension DetailWeatherVC: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         cell.alpha = 0
-        cell.layer.transform = CATransform3DMakeScale(0.8, 0.8, 0.8)
-        UIView.animate(withDuration: 0.25, delay: 0.05 * Double(indexPath.row)) {
+        cell.layer.transform = CATransform3DMakeScale(0.9, 0.9, 0.9)
+        UIView.animate(withDuration: 0.25, delay: 0.1 * Double(indexPath.row)) {
             cell.alpha = 1
             cell.layer.transform = CATransform3DScale(CATransform3DIdentity, 1, 1, 1)
         }

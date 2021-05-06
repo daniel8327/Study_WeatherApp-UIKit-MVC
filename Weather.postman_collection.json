@@ -1,0 +1,134 @@
+{
+	"id": "8f09182e-2f6e-0c21-80ca-4b6aa691f8b7",
+	"name": "Weather",
+	"description": "",
+	"order": [
+		"5adba3da-9b0e-3314-fb91-4a2ec1297b90",
+		"c316bd44-6bf3-1b1b-1f11-1ddaaffd4a85"
+	],
+	"folders": [],
+	"folders_order": [],
+	"timestamp": 1620291688500,
+	"owner": "220539",
+	"public": false,
+	"requests": [
+		{
+			"id": "5adba3da-9b0e-3314-fb91-4a2ec1297b90",
+			"headers": "",
+			"headerData": [],
+			"url": "http://api.openweathermap.org/data/2.5/weather?lat=37.5506591796875&lang=KR&appid=0367480f207592a2a18d028adaac65d2&lon=127.17398216166151&units=metric",
+			"queryParams": [
+				{
+					"key": "lat",
+					"value": "37.5506591796875",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "lang",
+					"value": "KR",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "appid",
+					"value": "0367480f207592a2a18d028adaac65d2",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "lon",
+					"value": "127.17398216166151",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "units",
+					"value": "metric",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				}
+			],
+			"pathVariables": {},
+			"pathVariableData": [],
+			"preRequestScript": null,
+			"method": "GET",
+			"collectionId": "8f09182e-2f6e-0c21-80ca-4b6aa691f8b7",
+			"data": null,
+			"dataMode": "params",
+			"name": "위경도_조회",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1620291690144,
+			"version": 2,
+			"responses": [],
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {}
+		},
+		{
+			"id": "c316bd44-6bf3-1b1b-1f11-1ddaaffd4a85",
+			"headers": "",
+			"headerData": [],
+			"url": "https://api.openweathermap.org/data/2.5/onecall?appid=0367480f207592a2a18d028adaac65d2&lat=37.550689697265625&lang=KR&lon=127.17393138199375&units=metric",
+			"queryParams": [
+				{
+					"key": "appid",
+					"value": "0367480f207592a2a18d028adaac65d2",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "lat",
+					"value": "37.550689697265625",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "lang",
+					"value": "KR",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "lon",
+					"value": "127.17393138199375",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "units",
+					"value": "metric",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				}
+			],
+			"pathVariables": {},
+			"pathVariableData": [],
+			"preRequestScript": null,
+			"method": "GET",
+			"collectionId": "8f09182e-2f6e-0c21-80ca-4b6aa691f8b7",
+			"data": null,
+			"dataMode": "params",
+			"name": "상세날씨",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1620291721401,
+			"version": 2,
+			"responses": [],
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {}
+		}
+	]
+}
