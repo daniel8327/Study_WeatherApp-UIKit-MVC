@@ -32,14 +32,29 @@ class DetailWeatherPageVC: UIPageViewController {
         
         self.dataSource = self
         self.delegate = self
-        
-        self.setViewControllers([instantiateViewController(index: self.index)] as [UIViewController],
-                                direction: .forward,
-                                animated: true) { _ in
-            //self.setupPageControl()
-        }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        checkItems()
+    }
+    func checkItems() {
+        
+        if items.isEmpty {
+            let vc = MainVC()
+            vc.modalClosedAlias = {
+                self.checkItems()
+            }
+            self.present(vc, animated: true)
+        } else {
+            self.setViewControllers([instantiateViewController(index: self.index)] as [UIViewController],
+                                    direction: .forward,
+                                    animated: true) { _ in
+                //self.setupPageControl()
+            }
+        }
+    }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 

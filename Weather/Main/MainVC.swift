@@ -5,13 +5,13 @@
 //  Created by 장태현 on 2021/04/17.
 //
 
-import CoreData
 import CoreLocation
 import UIKit
 
 import Alamofire
 import SwiftyJSON
 
+typealias ModalClosedAlias = ()-> Void
 
 class MainVC: UIViewController {
     
@@ -85,8 +85,11 @@ class MainVC: UIViewController {
         return tbv
     }()
     
+    var modalClosedAlias: ModalClosedAlias?
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
+        modalClosedAlias?()
     }
 
     private let dateFormatter: DateFormatter = {
@@ -199,17 +202,15 @@ class MainVC: UIViewController {
     func checkLocations() {
         
         // 설정된 도시 없으면 물어보기
-        if self.items.isEmpty, !_UDS.bool(forKey: NotificationNames.addLocation.rawValue) {
+        if self.items.isEmpty {
             let alert = UIAlertController(title: "지역 선택", message: "날씨 정보를 받아볼 지역을 검색하세요.", preferredStyle: .alert)
             let confirmAction = UIAlertAction(title: "확인", style: .default) { _ in
                 self.addLocation()
-                _UDS.setValue(true, forKey: NotificationNames.addLocation.rawValue) // 한번만 물어보기
             }
-            let cancelAction = UIAlertAction(title: "취소", style: .cancel) { _ in
-                _UDS.setValue(true, forKey: NotificationNames.addLocation.rawValue) // 한번만 물어보기
-            }
+            //let cancelAction = UIAlertAction(title: "취소", style: .cancel)
+            
             alert.addAction(confirmAction)
-            alert.addAction(cancelAction)
+            //alert.addAction(cancelAction)
             
             self.present(alert, animated: true)
         }

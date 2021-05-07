@@ -20,6 +20,31 @@ struct API {
     init(session: SessionManagerProtocol) {
         sessionManager = session
     }
+    
+    func requestSync(_ convertible: Alamofire.URLConvertible, method: Alamofire.HTTPMethod, parameters: Alamofire.Parameters?) -> JSON {
+        
+        let semaphore = DispatchSemaphore(value: 0)
+        
+        var json: JSON!
+        
+        self.request(
+            convertible,
+            method: method,
+            parameters: parameters,
+            encoding: URLEncoding.default,
+            headers: nil,
+            interceptor: nil,
+            requestModifier: nil) { data in
+            
+            json = data
+            
+            semaphore.signal()
+        }
+        
+        semaphore.wait()
+        
+        return json
+    }
 
     /// 통신 프로토콜 기본형
     /// - Parameters:
