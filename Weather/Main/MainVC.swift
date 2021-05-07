@@ -38,10 +38,13 @@ class MainVC: UIViewController {
         view.addSubview(tbv)
         
         tbv.translatesAutoresizingMaskIntoConstraints = false
-        tbv.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        tbv.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        tbv.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        tbv.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        
+        NSLayoutConstraint.activate([
+            tbv.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tbv.topAnchor.constraint(equalTo: view.topAnchor),
+            tbv.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tbv.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
         
         tbv.register(UINib(nibName: WeatherCell.reusableIdentifier, bundle: nil), forCellReuseIdentifier: WeatherCell.reusableIdentifier)
         tbv.separatorStyle = .none
@@ -104,8 +107,6 @@ class MainVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        
-        Indicator.INSTANCE.startAnimating()
         
         view.backgroundColor = .systemBackground
         
@@ -414,8 +415,11 @@ extension MainVC: UITableViewDelegate {
         
         // PageViewController 호출
         let vc = DetailWeatherPageVC(items: self.items, index: indexPath.row)
+        //vc.modalPresentationStyle = .fullScreen
     
-        //UICommon.setTransitionAnimation(navi: self.navigationController)
+        UICommon.setTransitionAnimation(navi: self.navigationController)
+        
+        
         self.present(vc, animated: true)
     }
     

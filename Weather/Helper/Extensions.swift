@@ -146,3 +146,14 @@ extension Notification.Name {
     static let addLocation = Notification.Name(NotificationNames.addLocation.rawValue)
     static let changeNotation = Notification.Name(NotificationNames.changeNotation.rawValue)
 }
+
+extension UIPageViewController {
+    var pageControl: UIPageControl? {
+        for view in view.subviews {
+            if view is UIPageControl {
+                return view as? UIPageControl
+            }
+        }
+    return nil
+    }
+}

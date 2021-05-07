@@ -42,10 +42,14 @@ class DetailWeatherVC: UIViewController {
         
         view.addSubview(tbv)
         tbv.translatesAutoresizingMaskIntoConstraints = false
-        tbv.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        tbv.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        tbv.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        tbv.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        
+        NSLayoutConstraint.activate([
+            tbv.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tbv.topAnchor.constraint(equalTo: view.topAnchor),
+            tbv.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tbv.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
         //tbv.backgroundColor = .random
         
         // 헤더

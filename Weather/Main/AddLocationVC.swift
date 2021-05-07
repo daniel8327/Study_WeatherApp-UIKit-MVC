@@ -28,9 +28,12 @@ class AddLocationVC: UIViewController {
         
         view.addSubview(searchBar)
         searchBar.translatesAutoresizingMaskIntoConstraints = false
-        searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        searchBar.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        NSLayoutConstraint.activate([
+            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            searchBar.topAnchor.constraint(equalTo: view.topAnchor),
+            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
         
         searchBar.prompt = "Enter city, zip code, airport lcoation"
         
@@ -47,10 +50,13 @@ class AddLocationVC: UIViewController {
         
         view.addSubview(tbv)
         tbv.translatesAutoresizingMaskIntoConstraints = false
-        tbv.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        tbv.topAnchor.constraint(equalTo: searchBar.bottomAnchor).isActive = true
-        tbv.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        tbv.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        
+        NSLayoutConstraint.activate([
+            tbv.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tbv.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
+            tbv.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tbv.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
         
         tbv.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         

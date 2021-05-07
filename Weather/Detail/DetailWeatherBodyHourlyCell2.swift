@@ -38,10 +38,13 @@ class DetailWeatherBodyHourlyCell2: UITableViewCell {
         
         // Setup Autolayout constraints
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0).isActive = true
-        collectionView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 0).isActive = true
-        collectionView.topAnchor.constraint(equalTo: self.topAnchor, constant: 0).isActive = true
-        collectionView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: 0).isActive = true
+        
+        NSLayoutConstraint.activate([
+            collectionView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0),
+            collectionView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 0),
+            collectionView.topAnchor.constraint(equalTo: self.topAnchor, constant: 0),
+            collectionView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: 0)
+        ])
         
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.backgroundColor = .systemBackground
