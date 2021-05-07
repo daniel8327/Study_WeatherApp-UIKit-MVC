@@ -34,38 +34,23 @@ struct API {
             .responseJSON(completionHandler: { response in
 
                 _SI.stopAnimating()
-
-                if let error = response.error {
-                    print(error)
-                    print("Error occured")
-                    // alert
-
-                    if let topVC = UIApplication.getTopViewController() {
-                        Alert.show(parent: topVC, title: "network_Error", message: error.localizedDescription)
-                    }
-                } else {
-                    guard let responseData = response.data else {
-                        print("Data is missing")
-                        // alert
-
-                        if let topVC = UIApplication.getTopViewController() {
-                            Alert.show(parent: topVC, title: "Network Error", message: "Data is missing")
-                        }
-                        return
-                    }
-
-                    let json = JSON(responseData)
+                
+                switch response.result {
+                case .success(let data):
+                    let json = JSON(data)
 
                     //print("path : \(convertible)\njson => \(json)\n")
 
                     if !json["cod"].exists() || json["cod"].intValue == 200 {
                         completionHandler(json)
                     } else {
-                        // alert
-                        if let topVC = UIApplication.getTopViewController() {
-                            Alert.show(parent: topVC, title: "Failed", message: json["MESSAGE"].stringValue)
-                        }
+                        Alert.show(parent: nil, title: "Failed", message: json["MESSAGE"].stringValue)
                     }
+                case .failure(let error):
+                    
+                    print(error)
+                    print("Error occured")
+                    Alert.show(parent: nil, title: "network_Error", message: error.localizedDescription)
                 }
             })
     }

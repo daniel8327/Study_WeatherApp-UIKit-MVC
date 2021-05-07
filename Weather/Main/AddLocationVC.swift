@@ -23,21 +23,21 @@ class AddLocationVC: UIViewController {
     weak var saveDelegate: SaveLocationDelegate?
     var saveLocationAlias: SaveLocationAlias?
     
-    var guideLabel: UILabel!
-    
     lazy var searchBar: UISearchBar = {
-        let aa = UISearchBar(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 50))
+        let searchBar = UISearchBar(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 50))
         
-        view.addSubview(aa)
-        aa.translatesAutoresizingMaskIntoConstraints = false
-        aa.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        aa.topAnchor.constraint(equalTo: guideLabel.bottomAnchor).isActive = true
-        aa.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        view.addSubview(searchBar)
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        searchBar.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        aa.delegate = self
-        aa.showsCancelButton = true
-        aa.becomeFirstResponder()
-        return aa
+        searchBar.prompt = "Enter city, zip code, airport lcoation"
+        
+        searchBar.delegate = self
+        searchBar.showsCancelButton = true
+        searchBar.becomeFirstResponder()
+        return searchBar
     }()
     
     lazy var searchResultTable: UITableView = {
@@ -58,24 +58,10 @@ class AddLocationVC: UIViewController {
     }()
     
     
-    //var delegate: SearchViewDelegate?
+    // MARK: View Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let label = UILabel(frame: .zero)
-        guideLabel = label
-        
-        label.text = "Enter city, zip code, airport lcoation"
-        label.textAlignment = .center
-        label.textColor = .lightGray
-        
-        view.addSubview(label)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        label.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        label.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        label.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         view.backgroundColor = .systemBackground
         
@@ -87,10 +73,62 @@ class AddLocationVC: UIViewController {
         searchResultTable.delegate = self
         searchResultTable.dataSource = self
     }
+    
+    // MARK: User Functions
+    
+    func manupulateResult(completion: MKLocalSearchCompletion) {
+        
+        let searchRequest = MKLocalSearch.Request(completion: completion)
+        let search = MKLocalSearch(request: searchRequest)
+        search.start { (response, error) in
+            
+            guard error == nil else {
+                Alert.show(parent: nil, title: "Error", message: error!.localizedDescription)
+                return
+            }
+            
+            guard let placeMark = response?.mapItems[0].placemark else {
+                return
+            }
+            print("placeMark : \(placeMark)")
+            
+            let param: [String: Any] = ["lat": placeMark.coordinate.latitude.description,
+                                        "lon": placeMark.coordinate.longitude.description]
+            
+            API.init(session: Session.default)
+                .request(API.WEATHER,
+                         method: .get,
+                         parameters: param,
+                         encoding: URLEncoding.default,
+                         headers: nil,
+                         interceptor: nil,
+                         requestModifier: nil) { json in
+                    
+                    //print("addLocation: \(json)")
+                
+                    // CoreData 저장 델리게이트 SaveLocationDelegate
+                    self.saveDelegate?
+                        .requestSave(
+                            vo: LocationVO(
+                                currentArea: false,
+                                city: placeMark.title ?? json["name"].stringValue,
+                                code: json["id"].stringValue,
+                                longitude: json["coord"]["lon"].stringValue,
+                                latitude: json["coord"]["lat"].stringValue,
+                                recent_temp: json["main"]["temp"].intValue,
+                                timezone: json["timezone"].int64Value
+                            )
+                        )
+                    
+                    self.dismiss(animated: true, completion: nil)
+                }
+        }
+    }
 }
 
 extension AddLocationVC: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
         if searchText == "" {
             searchResults.removeAll()
             searchResultTable.reloadData()
@@ -105,14 +143,17 @@ extension AddLocationVC: UISearchBarDelegate {
 }
 
 extension AddLocationVC: MKLocalSearchCompleterDelegate {
+    
   // 자동완성 완료시 결과를 받는 method
   func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
         searchResults = completer.results
         searchResultTable.reloadData()
     }
+    
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         print(error)
         print(error.localizedDescription)
+        Alert.show(parent: nil, title: "Error", message: error.localizedDescription)
     }
 }
 
@@ -138,54 +179,11 @@ extension AddLocationVC: UITableViewDataSource {
 }
 
 extension AddLocationVC: UITableViewDelegate {
+    
   // 선택된 위치의 정보 가져오기
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedResult = searchResults[indexPath.row]
-        let searchRequest = MKLocalSearch.Request(completion: selectedResult)
-        let search = MKLocalSearch(request: searchRequest)
-        search.start { (response, error) in
-            guard error == nil else {
-                print(error?.localizedDescription)
-                return
-            }
-            
-            print("response: \(response)")
-            guard let placeMark = response?.mapItems[0].placemark else {
-                return
-            }
-            print("placeMark : \(placeMark)")
-            
-            let param: [String: Any] = ["lat": placeMark.coordinate.latitude.description,
-                                        "lon": placeMark.coordinate.longitude.description]
-            
-            API.init(session: Session.default)
-                .request(API.WEATHER,
-                         method: .get,
-                         parameters: param,
-                         encoding: URLEncoding.default,
-                         headers: nil,
-                         interceptor: nil,
-                         requestModifier: nil) { json in
-                    
-                    print("addLocation: \(json)")
-                
-                    // CoreData 저장 델리게이트 SaveLocationDelegate
-                    self.saveDelegate?
-                        .requestSave(
-                            vo: LocationVO(
-                                currentArea: false,
-                                city: placeMark.title ?? json["name"].stringValue,
-                                code: json["id"].stringValue,
-                                longitude: json["coord"]["lon"].stringValue,
-                                latitude: json["coord"]["lat"].stringValue,
-                                recent_temp: json["main"]["temp"].intValue,
-                                timezone: json["timezone"].int64Value
-                            )
-                        )
-                    
-                    self.dismiss(animated: true, completion: nil)
-                }
-        }
+        manupulateResult(completion: selectedResult)
     }
 }
 

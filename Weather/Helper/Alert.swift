@@ -15,7 +15,7 @@ class Alert: UIAlertController {
     ///   - parent: 얼럿을 표현할 뷰컨트롤러
     ///   - title: 얼럿의 제목 (nil 일 경우 앱 이름으로 처리)
     ///   - message: 얼럿의 메세지
-    class func show(parent: UIViewController, title: String?, message: String) {
+    class func show(parent: UIViewController?, title: String?, message: String) {
         show(parent: parent, title: title, message: message, preferredStyle: .alert, actionConfirmTitle: "ok", actionCancelTitle: nil)
     }
 
@@ -25,7 +25,7 @@ class Alert: UIAlertController {
     ///   - title: 얼럿의 제목 (nil 일 경우 앱 이름으로 처리)
     ///   - message: 얼럿의 메세지
     ///   - actionConfirmCallback: 확인버튼 콜백
-    class func show(parent: UIViewController, title: String?, message: String, actionConfirmCallback: ((UIAlertAction) -> Void)? = nil) {
+    class func show(parent: UIViewController?, title: String?, message: String, actionConfirmCallback: ((UIAlertAction) -> Void)? = nil) {
         show(parent: parent, title: title, message: message, preferredStyle: .alert, actionConfirmTitle: nil, actionConfirmCallback: actionConfirmCallback, actionCancelTitle: nil, actionCancelCallback: nil)
     }
 
@@ -39,7 +39,7 @@ class Alert: UIAlertController {
     ///   - actionConfirmCallback: 확인버튼 콜백
     ///   - actionCancelTitle: 얼럿 취소버튼의 문자열
     ///   - actionCancelCallback: 취소버튼 콜백
-    class func show(parent: UIViewController, title: String?, message: String, preferredStyle: UIAlertController.Style? = nil, actionConfirmTitle: String?, actionConfirmCallback: ((UIAlertAction) -> Void)? = nil, actionCancelTitle: String? = nil, actionCancelCallback: ((UIAlertAction) -> Void)? = nil) {
+    class func show(parent: UIViewController?, title: String?, message: String, preferredStyle: UIAlertController.Style? = nil, actionConfirmTitle: String?, actionConfirmCallback: ((UIAlertAction) -> Void)? = nil, actionCancelTitle: String? = nil, actionCancelCallback: ((UIAlertAction) -> Void)? = nil) {
         let alert = UIAlertController(title: title ?? "", message: message, preferredStyle: preferredStyle ?? .alert)
 
         let alertConfirmAction = UIAlertAction(title: actionConfirmTitle ?? "ok", style: .default, handler: actionConfirmCallback)
@@ -50,6 +50,11 @@ class Alert: UIAlertController {
             alert.addAction(alertCancelAction)
         }
 
-        parent.present(alert, animated: true, completion: nil)
+        
+        if parent == nil, let topVC = UIApplication.getTopViewController() {
+            topVC.present(alert, animated: true, completion: nil)
+        } else {
+            parent!.present(alert, animated: true, completion: nil)
+        }
     }
 }

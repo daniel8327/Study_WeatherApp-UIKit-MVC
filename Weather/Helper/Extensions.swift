@@ -141,3 +141,8 @@ extension UIView {
         layer.add(animation, forKey: CATransitionType.fade.rawValue)
     }
 }
+
+extension Notification.Name {
+    static let addLocation = Notification.Name(NotificationNames.addLocation.rawValue)
+    static let changeNotation = Notification.Name(NotificationNames.changeNotation.rawValue)
+}

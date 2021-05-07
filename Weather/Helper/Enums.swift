@@ -35,3 +35,9 @@ extension FahrenheitOrCelsius {
         }
     }
 }
+
+
+enum NotificationNames: String {
+    case changeNotation
+    case addLocation
+}

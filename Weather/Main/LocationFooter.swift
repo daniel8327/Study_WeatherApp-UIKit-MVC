@@ -27,9 +27,7 @@ class LocationFooter: UIView {
         theWeather.addGestureRecognizer(webGesture)
         theWeather.isUserInteractionEnabled = true
         
-        notation.tag = 1
-        //NotificationCenter.default.post(name: Notification.Name("CHANGE_NOTATION"), object: nil)
-        
+        notation.tag = 1        
         
         // footer 바꾸기
         let attributeString = NSMutableAttributedString(string: notation.text ?? "")
@@ -53,10 +51,10 @@ class LocationFooter: UIView {
     }
     
     @objc func changeNotation() {
-        NotificationCenter.default.post(name: Notification.Name("CHANGE_NOTATION"), object: nil)
+        NotificationCenter.default.post(name: .changeNotation, object: nil)
     }
     
     @IBAction func searchLocationTapped(_ sender: UIButton) {
-        NotificationCenter.default.post(name: Notification.Name("ADD_LOCATION"), object: nil)
+        NotificationCenter.default.post(name: .addLocation, object: nil)
     }
 }

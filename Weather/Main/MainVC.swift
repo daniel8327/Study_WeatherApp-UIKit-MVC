@@ -59,7 +59,7 @@ class MainVC: UIViewController {
                     .addObserver(
                         self,
                         selector: #selector(addLocation),
-                        name: Notification.Name("ADD_LOCATION"),
+                        name: .addLocation,
                         object: nil)
                 
                 NotificationCenter
@@ -67,7 +67,7 @@ class MainVC: UIViewController {
                     .addObserver(
                         self,
                         selector: #selector(changeNotation),
-                        name: Notification.Name("CHANGE_NOTATION"),
+                        name: .changeNotation,
                         object: nil)
             }
         }
@@ -198,14 +198,14 @@ class MainVC: UIViewController {
     func checkLocations() {
         
         // 설정된 도시 없으면 물어보기
-        if self.items.isEmpty, !_UDS.bool(forKey: "ADD_LOCATION") {
+        if self.items.isEmpty, !_UDS.bool(forKey: NotificationNames.addLocation.rawValue) {
             let alert = UIAlertController(title: "지역 선택", message: "날씨 정보를 받아볼 지역을 검색하세요.", preferredStyle: .alert)
             let confirmAction = UIAlertAction(title: "확인", style: .default) { _ in
                 self.addLocation()
-                _UDS.setValue(true, forKey: "ADD_LOCATION") // 한번만 물어보기
+                _UDS.setValue(true, forKey: NotificationNames.addLocation.rawValue) // 한번만 물어보기
             }
             let cancelAction = UIAlertAction(title: "취소", style: .cancel) { _ in
-                _UDS.setValue(true, forKey: "ADD_LOCATION") // 한번만 물어보기
+                _UDS.setValue(true, forKey: NotificationNames.addLocation.rawValue) // 한번만 물어보기
             }
             alert.addAction(confirmAction)
             alert.addAction(cancelAction)
@@ -453,7 +453,14 @@ extension MainVC: UITableViewDelegate {
 extension MainVC: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        if status == .authorizedAlways || status == .authorizedWhenInUse {
+        
+        switch status {
+        
+        case .authorizedAlways,
+             .authorizedWhenInUse:
+            
+            // 위치 정확도 Best, 배터리 많이 잡아먹음
+            manager.desiredAccuracy = kCLLocationAccuracyBest
             
             print(locationManager)
             guard let currentLocation = locationManager.location else { return }
@@ -484,9 +491,9 @@ extension MainVC: CLLocationManagerDelegate {
                          encoding: URLEncoding.default,
                          headers: nil,
                          interceptor: nil,
-                         requestModifier: nil) { json in
+                         requestModifier: nil) { [weak self] json in
                     
-                    self.tableView.performBatchUpdates ({
+                    self?.tableView.performBatchUpdates ({
                         
                         let locationVO = LocationVO(
                             currentArea: true,
@@ -504,11 +511,11 @@ extension MainVC: CLLocationManagerDelegate {
                             location: locationVO
                         )
                         
-                        self.items.insert(locationVO,at: 0)
-                        self.tableView.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .top)
+                        self?.items.insert(locationVO,at: 0)
+                        self?.tableView.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .top)
                     }, completion: nil)
                 }
-        } else {
+        default:
             removeCurrentData()
         }
     }
