@@ -23,7 +23,7 @@ struct API {
     
     func requestSync(_ url: URLRequest) -> JSON {
         
-        Indicator.INSTANCE.startAnimating()
+        //Indicator.INSTANCE.startAnimating()
         
         let semaphore = DispatchSemaphore(value: 0)
         
@@ -43,11 +43,11 @@ struct API {
         
         print("semaphore start wait")
         task.resume()
-        //_ = semaphore.wait(timeout: DispatchTime.now() + .seconds(30))
-        semaphore.wait()
+        _ = semaphore.wait(timeout: DispatchTime.now() + .seconds(30))
+        //semaphore.wait()
         
         print("semaphore end wait")
-        Indicator.INSTANCE.terminateIndicator()
+        //Indicator.INSTANCE.terminateIndicator()
         
         return json
     }
@@ -60,12 +60,12 @@ struct API {
     ///   - completionHandler: 콜백
     func request(_ convertible: Alamofire.URLConvertible, method: Alamofire.HTTPMethod, parameters: Alamofire.Parameters?, encoding: Alamofire.ParameterEncoding, headers: Alamofire.HTTPHeaders?, interceptor: Alamofire.RequestInterceptor?, requestModifier: Alamofire.Session.RequestModifier?, completionHandler: @escaping (JSON) -> Void) {
         
-        _SI.startAnimating()
+        //_SI.startAnimating()
         
         sessionManager.request(convertible, method: method, parameters: setAdditionalInfo(params: parameters), encoding: encoding, headers: headers, interceptor: interceptor, requestModifier: requestModifier)
             .responseJSON(completionHandler: { response in
                 
-                _SI.stopAnimating()
+                //_SI.stopAnimating()
                 
                 switch response.result {
                 case .success(let data):

@@ -288,14 +288,14 @@ extension DetailWeatherVC: UITableViewDataSource {
 
 extension DetailWeatherVC: UITableViewDelegate {
     
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        cell.alpha = 0
-        cell.layer.transform = CATransform3DMakeScale(0.9, 0.9, 0.9)
-        UIView.animate(withDuration: 0.25, delay: 0.1 * Double(indexPath.row)) {
-            cell.alpha = 1
-            cell.layer.transform = CATransform3DScale(CATransform3DIdentity, 1, 1, 1)
-        }
-    }
+//    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+//        cell.alpha = 0
+//        cell.layer.transform = CATransform3DMakeScale(0.9, 0.9, 0.9)
+//        UIView.animate(withDuration: 0.25, delay: 0.1 * Double(indexPath.row)) {
+//            cell.alpha = 1
+//            cell.layer.transform = CATransform3DScale(CATransform3DIdentity, 1, 1, 1)
+//        }
+//    }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         // DetailWeatherBodyHourlyCollectionViewCell 의 ContentView's heght 가 130 이며 CollectionView의 UIEdgeInsets가 top + bottom 이 32 이므로 최소 크기로 130 + 32를 선언해줘야한다. 만약 이보다 작은 경우 'The behavior of the UICollectionViewFlowLayout is not defined' Warning이 발생한다.

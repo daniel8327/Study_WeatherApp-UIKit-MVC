@@ -19,7 +19,7 @@ class CoreDataHelper {
         do {
             // 정렬 속성
             let sortCurrentArea = NSSortDescriptor(key: "currentArea", ascending: false)
-            let sortRegDate = NSSortDescriptor(key: "regdate", ascending: false)
+            let sortRegDate = NSSortDescriptor(key: "regdate", ascending: true)
             
             fetchRequest.sortDescriptors = [sortCurrentArea, sortRegDate]
             

@@ -11,7 +11,7 @@ import UIKit
 import Alamofire
 import SwiftyJSON
 
-typealias ModalClosedAlias = ()-> Void
+typealias ModalClosedAlias = (Int, [LocationVO])-> Void
 
 class MainVC: UIViewController {
     
@@ -89,7 +89,6 @@ class MainVC: UIViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-        modalClosedAlias?()
     }
 
     private let dateFormatter: DateFormatter = {
@@ -405,23 +404,20 @@ extension MainVC: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-        /*let object = items[indexPath.row]
-
-        let location = CLLocation(
-            latitude: CLLocationDegrees(Double(object.latitude)!),
-            longitude: CLLocationDegrees(Double(object.longitude)!)
-        )
-        let vc = DetailWeatherVC(locationName: object.city, locationCode: object.code, location: location)*/
-        
+        /*
         // PageViewController 호출
         let vc = DetailWeatherPageVC(items: self.items, index: indexPath.row)
         //vc.modalPresentationStyle = .fullScreen
-    
+        
         UICommon.setTransitionAnimation(navi: self.navigationController)
         
         
         self.present(vc, animated: true)
+        */
+        
+        modalClosedAlias?(indexPath.row, items)
+        
+        self.dismiss(animated: true)
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {

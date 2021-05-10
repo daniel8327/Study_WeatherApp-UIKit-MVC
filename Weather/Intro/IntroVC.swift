@@ -45,6 +45,77 @@ class IntroVC: UIViewController {
         }
     }
     
+    /// 현위치 정보 얻기
+    /// - Parameters:
+    ///   - manager: CLLocationManager
+    ///   - completeHandler: Void -> Void
+    func currentLocationInfo(manager: CLLocationManager, completeHandler: @escaping ()->Void) {
+        
+        let prevLocation = CoreDataHelper.fetchByCurrent()
+        
+        guard let currentLocation = locationManager.location else {
+            
+            if let _ = prevLocation {
+                // 지난 현재위치 삭제
+                CoreDataHelper.delete(object: prevLocation!)
+            }
+            completeHandler()
+            return
+        }
+        
+        if let loc = prevLocation {
+            print("이전 위치가 있음")
+            if ((loc.value(forKey: "longitude") as! String).nearBy() == currentLocation.coordinate.longitude.description.nearBy()) &&
+                ((loc.value(forKey: "latitude") as! String).nearBy() == currentLocation.coordinate.latitude.description.nearBy()) {
+                // do nothing
+                
+                print("위치 같아서 안해도 됨")
+                completeHandler()
+                return
+            } else {
+                print("위치 달라서 조회해야됨")
+                // 지난 현재위치 삭제 후 새로운 위치 받기
+                CoreDataHelper.delete(object: loc)
+            }
+        }
+        
+        print("계속진행")
+        
+        let param: [String: Any] =
+            ["lat": currentLocation.coordinate.latitude,
+             "lon": currentLocation.coordinate.longitude]
+        
+        API(session: Session.default)
+            .request(API.WEATHER,
+                     method: .get,
+                     parameters: param,
+                     encoding: URLEncoding.default,
+                     headers: nil,
+                     interceptor: nil,
+                     requestModifier: nil,
+                     completionHandler: { json in
+                        
+                        let locationVO = LocationVO(
+                            currentArea: true,
+                            city: json["name"].stringValue,
+                            code: json["id"].stringValue,
+                            longitude: String(currentLocation.coordinate.longitude),
+                            latitude: String(currentLocation.coordinate.latitude),
+                            recent_temp: json["main"]["temp"].intValue,
+                            timezone: json["timezone"].int64Value
+                        )
+                        
+                        // 기존에 현위치 저장된 것이 있다면 업데이트 없으면 인서트
+                        CoreDataHelper.save(
+                            object: prevLocation,
+                            location: locationVO
+                        )
+                        
+                        completeHandler()
+                     })
+    }
+    
+    @available(*, deprecated)
     func currentLocationInfo(manager: CLLocationManager) {
         
         let prevLocation = CoreDataHelper.fetchByCurrent()
@@ -59,6 +130,7 @@ class IntroVC: UIViewController {
         }
         
         if let loc = prevLocation {
+            print("이전 위치가 있음")
             if ((loc.value(forKey: "longitude") as! String).nearBy() == currentLocation.coordinate.longitude.description.nearBy()) &&
                 ((loc.value(forKey: "latitude") as! String).nearBy() == currentLocation.coordinate.latitude.description.nearBy()) {
                 // do nothing
@@ -67,10 +139,13 @@ class IntroVC: UIViewController {
                 
                 return
             } else {
+                print("위치 달라서 조회해야됨")
                 // 지난 현재위치 삭제 후 새로운 위치 받기
                 CoreDataHelper.delete(object: loc)
             }
         }
+        
+        print("계속진행")
         
         var url = URLComponents(string: API.WEATHER)!
         
@@ -112,39 +187,41 @@ extension IntroVC: CLLocationManagerDelegate {
         
         if status != .notDetermined {
             // 현위치 처리
-            currentLocationInfo(manager: manager)
-            
-            // 조회
-            let result = CoreDataHelper.fetch()
-            
-            var items: [LocationVO] = []
-            
-            _ = result.map {
-                items.append(
-                    LocationVO(
-                        currentArea: $0.value(forKey: "currentArea") as! Bool,
-                        city: $0.value(forKey: "city") as! String,
-                        code: $0.value(forKey: "code") as! String,
-                        longitude: $0.value(forKey: "longitude") as! String,
-                        latitude: $0.value(forKey: "latitude") as! String,
-                        recent_temp: $0.value(forKey: "recent_temp") as? Int,
-                        timezone: $0.value(forKey: "timezone") as! Int64
-                    )
-                )
-            }
-            
-            let vc = DetailWeatherPageVC(items: items, index: 0)
-            vc.modalPresentationStyle = .fullScreen
-            
-            switch status {
-            
-            case .authorizedAlways,
-                 .authorizedWhenInUse:
+            currentLocationInfo(manager: manager) {
                 
-                self.present(vc, animated: false)
-            default:
-                removeCurrentData()
-                self.present(vc, animated: false)
+                // 조회
+                let result = CoreDataHelper.fetch()
+                
+                var items: [LocationVO] = []
+                
+                _ = result.map {
+                    items.append(
+                        LocationVO(
+                            currentArea: $0.value(forKey: "currentArea") as! Bool,
+                            city: $0.value(forKey: "city") as! String,
+                            code: $0.value(forKey: "code") as! String,
+                            longitude: $0.value(forKey: "longitude") as! String,
+                            latitude: $0.value(forKey: "latitude") as! String,
+                            recent_temp: $0.value(forKey: "recent_temp") as? Int,
+                            timezone: $0.value(forKey: "timezone") as! Int64
+                        )
+                    )
+                }
+                
+                //let vc = DetailWeatherPageVC(items: items, index: 0)
+                let vc = DetailWeatherPageVC(items: items, index: 0)
+                vc.modalPresentationStyle = .fullScreen
+                
+                switch status {
+                
+                case .authorizedAlways,
+                     .authorizedWhenInUse:
+                    
+                    self.present(vc, animated: false)
+                default:
+                    self.removeCurrentData()
+                    self.present(vc, animated: false)
+                }
             }
         }
     }
