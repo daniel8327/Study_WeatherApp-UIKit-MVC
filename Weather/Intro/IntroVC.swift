@@ -9,6 +9,7 @@ import CoreLocation
 import UIKit
 
 import Alamofire
+import SwiftyJSON
 
 class IntroVC: UIViewController {
     
@@ -17,7 +18,7 @@ class IntroVC: UIViewController {
         let locationManager = CLLocationManager()
         locationManager.delegate = self // CLLocationManagerDelegate
         locationManager.requestWhenInUseAuthorization()// 포그라운드에서 권한 요청
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest // 위치 정확도 Best, 배터리 많이 잡아먹음
                 
         return locationManager
     }()
@@ -48,9 +49,6 @@ class IntroVC: UIViewController {
         
         let prevLocation = CoreDataHelper.fetchByCurrent()
         
-        // 위치 정확도 Best, 배터리 많이 잡아먹음
-        manager.desiredAccuracy = kCLLocationAccuracyBest
-        
         guard let currentLocation = locationManager.location else {
             
             if let _ = prevLocation {
@@ -74,14 +72,21 @@ class IntroVC: UIViewController {
             }
         }
         
-        let param: [String: Any] =
-            ["lat": currentLocation.coordinate.latitude,
-             "lon": currentLocation.coordinate.longitude]
+        var url = URLComponents(string: API.WEATHER)!
         
+        url.queryItems = [
+            URLQueryItem(name: "lat", value: currentLocation.coordinate.latitude.description),
+            URLQueryItem(name: "lon", value: currentLocation.coordinate.longitude.description),
+            URLQueryItem(name: "appid", value: "0367480f207592a2a18d028adaac65d2"),
+            URLQueryItem(name: "lang", value: _COUNTRY),
+            URLQueryItem(name: "units", value: fahrenheitOrCelsius.pameter)
+            ]
+        
+        url.percentEncodedQuery = url.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
+        
+        // semaphore 처리
         let json = API(session: Session.default)
-            .requestSync(API.WEATHER,
-                         method: .get,
-                         parameters: param)
+            .requestSync(URLRequest(url: url.url!))
         
         let locationVO = LocationVO(
             currentArea: true,
@@ -105,40 +110,42 @@ extension IntroVC: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         
-        // 현위치 처리
-        currentLocationInfo(manager: manager)
-        
-        // 조회
-        let result = CoreDataHelper.fetch()
-        
-        var items: [LocationVO] = []
-        
-        _ = result.map {
-            items.append(
-                LocationVO(
-                    currentArea: $0.value(forKey: "currentArea") as! Bool,
-                    city: $0.value(forKey: "city") as! String,
-                    code: $0.value(forKey: "code") as! String,
-                    longitude: $0.value(forKey: "longitude") as! String,
-                    latitude: $0.value(forKey: "latitude") as! String,
-                    recent_temp: $0.value(forKey: "recent_temp") as? Int,
-                    timezone: $0.value(forKey: "timezone") as! Int64
-                )
-            )
-        }
-        
-        let vc = DetailWeatherPageVC(items: items, index: 0)
-        vc.modalPresentationStyle = .fullScreen
-        
-        switch status {
-        
-        case .authorizedAlways,
-             .authorizedWhenInUse:
+        if status != .notDetermined {
+            // 현위치 처리
+            currentLocationInfo(manager: manager)
             
-            self.present(vc, animated: false)
-        default:
-            removeCurrentData()
-            self.present(vc, animated: false)
+            // 조회
+            let result = CoreDataHelper.fetch()
+            
+            var items: [LocationVO] = []
+            
+            _ = result.map {
+                items.append(
+                    LocationVO(
+                        currentArea: $0.value(forKey: "currentArea") as! Bool,
+                        city: $0.value(forKey: "city") as! String,
+                        code: $0.value(forKey: "code") as! String,
+                        longitude: $0.value(forKey: "longitude") as! String,
+                        latitude: $0.value(forKey: "latitude") as! String,
+                        recent_temp: $0.value(forKey: "recent_temp") as? Int,
+                        timezone: $0.value(forKey: "timezone") as! Int64
+                    )
+                )
+            }
+            
+            let vc = DetailWeatherPageVC(items: items, index: 0)
+            vc.modalPresentationStyle = .fullScreen
+            
+            switch status {
+            
+            case .authorizedAlways,
+                 .authorizedWhenInUse:
+                
+                self.present(vc, animated: false)
+            default:
+                removeCurrentData()
+                self.present(vc, animated: false)
+            }
         }
     }
 }

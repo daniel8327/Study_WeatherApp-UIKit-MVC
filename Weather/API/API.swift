@@ -21,27 +21,33 @@ struct API {
         sessionManager = session
     }
     
-    func requestSync(_ convertible: Alamofire.URLConvertible, method: Alamofire.HTTPMethod, parameters: Alamofire.Parameters?) -> JSON {
+    func requestSync(_ url: URLRequest) -> JSON {
+        
+        Indicator.INSTANCE.startAnimating()
         
         let semaphore = DispatchSemaphore(value: 0)
         
         var json: JSON!
         
-        self.request(
-            convertible,
-            method: method,
-            parameters: parameters,
-            encoding: URLEncoding.default,
-            headers: nil,
-            interceptor: nil,
-            requestModifier: nil) { data in
+        print("semaphore start")
+        
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
             
-            json = data
+            if error != nil {
+                print("error: \(error?.localizedDescription)")
+                return
+            }
             
-            semaphore.signal()
+            json = JSON(data)
         }
         
+        print("semaphore start wait")
+        task.resume()
+        //_ = semaphore.wait(timeout: DispatchTime.now() + .seconds(30))
         semaphore.wait()
+        
+        print("semaphore end wait")
+        Indicator.INSTANCE.terminateIndicator()
         
         return json
     }
@@ -53,11 +59,12 @@ struct API {
     ///   - param: 파라메터
     ///   - completionHandler: 콜백
     func request(_ convertible: Alamofire.URLConvertible, method: Alamofire.HTTPMethod, parameters: Alamofire.Parameters?, encoding: Alamofire.ParameterEncoding, headers: Alamofire.HTTPHeaders?, interceptor: Alamofire.RequestInterceptor?, requestModifier: Alamofire.Session.RequestModifier?, completionHandler: @escaping (JSON) -> Void) {
+        
         _SI.startAnimating()
         
         sessionManager.request(convertible, method: method, parameters: setAdditionalInfo(params: parameters), encoding: encoding, headers: headers, interceptor: interceptor, requestModifier: requestModifier)
             .responseJSON(completionHandler: { response in
-
+                
                 _SI.stopAnimating()
                 
                 switch response.result {
@@ -89,7 +96,6 @@ struct API {
         parameters?.updateValue(appid, forKey: "appid")
         parameters?.updateValue(_COUNTRY, forKey: "lang")
         parameters?.updateValue(fahrenheitOrCelsius.pameter, forKey: "units")
-        
         return parameters
     }
 }
