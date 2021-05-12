@@ -14,7 +14,7 @@ import SwiftyJSON
 typealias SaveLocationAlias = (LocationVO) -> Void
 protocol SaveLocationDelegate: class { func requestSave(vo: LocationVO) }
 
-class AddLocationVC: UIViewController {
+class LocationAdditionVC: UIViewController {
     
     static let identifier = "AddLocationVC"
     private var searchCompleter = MKLocalSearchCompleter()
@@ -132,7 +132,7 @@ class AddLocationVC: UIViewController {
     }
 }
 
-extension AddLocationVC: UISearchBarDelegate {
+extension LocationAdditionVC: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
         if searchText == "" {
@@ -148,7 +148,7 @@ extension AddLocationVC: UISearchBarDelegate {
     }
 }
 
-extension AddLocationVC: MKLocalSearchCompleterDelegate {
+extension LocationAdditionVC: MKLocalSearchCompleterDelegate {
     
   // 자동완성 완료시 결과를 받는 method
   func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
@@ -163,7 +163,7 @@ extension AddLocationVC: MKLocalSearchCompleterDelegate {
     }
 }
 
-extension AddLocationVC: UITableViewDataSource {
+extension LocationAdditionVC: UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -184,7 +184,7 @@ extension AddLocationVC: UITableViewDataSource {
     
 }
 
-extension AddLocationVC: UITableViewDelegate {
+extension LocationAdditionVC: UITableViewDelegate {
     
   // 선택된 위치의 정보 가져오기
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -193,7 +193,7 @@ extension AddLocationVC: UITableViewDelegate {
     }
 }
 
-extension AddLocationVC: UIScrollViewDelegate {
+extension LocationAdditionVC: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         self.searchBar.resignFirstResponder()
     }

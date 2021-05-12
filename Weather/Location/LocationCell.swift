@@ -1,5 +1,5 @@
 //
-//  WeatherCell.swift
+//  LocationCell.swift
 //  Weather
 //
 //  Created by 장태현 on 2021/04/20.
@@ -9,7 +9,7 @@ import UIKit
 
 import SkeletonView
 
-class WeatherCell: UITableViewCell {
+class LocationCell: UITableViewCell {
     
     @IBOutlet weak var containerView: UIView!
     @IBOutlet weak var time: UILabel!

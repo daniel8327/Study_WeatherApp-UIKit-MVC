@@ -13,7 +13,7 @@ import SwiftyJSON
 
 typealias ModalClosedAlias = (Int, [LocationVO])-> Void
 
-class MainVC: UIViewController {
+class LocationsVC: UIViewController {
     
     lazy var locationManager: CLLocationManager = {
     
@@ -46,7 +46,7 @@ class MainVC: UIViewController {
             tbv.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         
-        tbv.register(UINib(nibName: WeatherCell.reusableIdentifier, bundle: nil), forCellReuseIdentifier: WeatherCell.reusableIdentifier)
+        tbv.register(UINib(nibName: LocationCell.reusableIdentifier, bundle: nil), forCellReuseIdentifier: LocationCell.reusableIdentifier)
         tbv.separatorStyle = .none
                 
         tbv.delegate = self
@@ -180,7 +180,7 @@ class MainVC: UIViewController {
     @objc func addLocation() {
         
         // 도시 검색
-        let vc = AddLocationVC()
+        let vc = LocationAdditionVC()
         
         vc.saveDelegate = self // SaveLocationDelegate
         /*
@@ -234,7 +234,7 @@ class MainVC: UIViewController {
     @available(*, deprecated)
     func setHeaderView() {
         
-        guard let headerView: WeatherCell = tableView.tableHeaderView as? WeatherCell,
+        guard let headerView: LocationCell = tableView.tableHeaderView as? LocationCell,
               let location = self.currentLocation
         else { return }
             
@@ -263,7 +263,7 @@ class MainVC: UIViewController {
     }
 }
 
-extension MainVC: UITableViewDataSource {
+extension LocationsVC: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         return items.count
@@ -271,7 +271,7 @@ extension MainVC: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "WeatherCell") as? WeatherCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "LocationCell") as? LocationCell
         else { fatalError() }
         
         cell.separatorInset = UIEdgeInsets.zero // https://zeddios.tistory.com/235
@@ -392,7 +392,7 @@ extension MainVC: UITableViewDataSource {
     }
 }
 
-extension MainVC: UITableViewDelegate {
+extension LocationsVC: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         cell.alpha = 0
@@ -451,7 +451,7 @@ extension MainVC: UITableViewDelegate {
     }
 }
 
-extension MainVC: CLLocationManagerDelegate {
+extension LocationsVC: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         
@@ -522,7 +522,7 @@ extension MainVC: CLLocationManagerDelegate {
     }
 }
 
-extension MainVC: SaveLocationDelegate {
+extension LocationsVC: SaveLocationDelegate {
     func requestSave(vo: LocationVO) {
         
         CoreDataHelper.save(object: nil, location: vo)
