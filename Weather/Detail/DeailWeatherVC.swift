@@ -275,8 +275,11 @@ extension DetailWeatherVC: UITableViewDataSource {
             
             let iconURL = "http://openweathermap.org/img/wn/\(data.weather[0].icon)@2x.png"
             
+            let pop = Int((data.pop ?? 0) * 100)
+            
+            print("pop: \(pop)")
             cell.icon.kf.setImage(with: URL(string: iconURL))
-            cell.rainExpectation.text = data.humidity > 30 ? "\(data.humidity)" : "" // 습도
+            cell.rainExpectation.text = pop > 0 ? "\(pop)%" : "" // 습도
             cell.max.text = "\(Int(data.temp.max))"
             cell.min.text = "\(Int(data.temp.min))"
             
